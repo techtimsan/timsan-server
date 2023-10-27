@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { PORT } from "./utils/constants"
+import { PORT } from "./lib/constants"
 
 const app: Express = express()
 
