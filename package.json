@@ -8,10 +8,7 @@
     "start": "nodemon src/index.ts",
     "build": "rimraf dist && tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://bitbucket.org/techtimsan/timsan_server_v2.git"
-  },
+  "repository": "git+https://bitbucket.org/techtimsan/timsan_server_v2.git",
   "keywords": [
     "Timsan",
     "Backend",
