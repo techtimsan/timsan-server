@@ -1,0 +1,59 @@
+{
+  "name": "timsan_server_v2",
+  "version": "1.0.0",
+  "description": "Timsan Backend Api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.ts",
+    "build": "rimraf dist && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/techtimsan/timsan_server_v2.git"
+  },
+  "keywords": [
+    "Timsan",
+    "Backend",
+    "Api"
+  ],
+  "author": "Muhammad Awwal, Ridwan Adefemi Odubona",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://bitbucket.org/techtimsan/timsan_server_v2/issues"
+  },
+  "homepage": "https://bitbucket.org/techtimsan/timsan_server_v2#readme",
+  "dependencies": {
+    "@prisma/client": "^5.5.2",
+    "@swc/cli": "^0.1.62",
+    "@swc/core": "^1.3.95",
+    "@tsconfig/node18": "^18.2.2",
+    "@types/cookie-parser": "^1.4.5",
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/jsonwebtoken": "^9.0.4",
+    "@types/morgan": "^1.9.7",
+    "@types/nodemailer": "^6.4.13",
+    "@types/otp-generator": "^4.0.1",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "argon2": "^0.31.1",
+    "bullmq": "^4.12.6",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.52.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.1",
+    "otp-generator": "^4.0.1",
+    "prisma": "^5.5.2",
+    "rate-limiter-flexible": "^3.0.2",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "zod": "^3.22.4"
+  }
+}
