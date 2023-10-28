@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.ts",
-    "build": "rimraf dist && tsc"
+    "start:dev": "nodemon src/index.ts",
+    "build": "rimraf builds && tsc --outDir ./builds",
+    "start:prod": "nodemon ./builds/index.js"
+
   },
   "repository": {
     "type": "git",
