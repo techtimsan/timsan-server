@@ -1,0 +1,323 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Schema
+model User {
+  id String @id @default(cuid())
+  firstName String
+  lastName String
+  status Int // TODO: Unknown
+  email String @unique
+  password String
+  accountType AccountType @default(MEMBER)
+  isAdmin Boolean @default(false)
+  isSuperAdmin Boolean @default(false)
+  emailToken String
+  profileStatus Int // TODO: ?
+  refreshToken String
+  profile MemberProfile[]
+  institutionProfile InstitutionProfile[]
+  stateProfile StateProfile[]
+  comments Comment[]
+  posts Post[] @relation("posts")
+  likedPosts Post[] @relation("likedPosts")
+  dislikedPosts Post[] @relation("dislikedPosts")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AccountType {
+  MEMBER
+  INSTITUTION
+  STATE
+  ZONAL
+  NEC
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum GraduationStatus {
+  GRADUATED // TODO: Get Graduation Status
+}
+
+model MemberProfile {
+  id String @id @default(cuid())
+  firstName String
+  lastName String
+  otherNames String
+  bio String
+  institution String
+  gender Gender
+  course String
+  occupation String
+  graduationStatus GraduationStatus
+  graduationDate DateTime // Should be Year?
+  stateOfOrigin String
+  stateOfResidence String
+  phoneNumber String
+  email String
+  avatarUrl String
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institutionProfileId String
+  institutionProfile InstitutionProfile @relation(fields: [institutionProfileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Zone {
+  SOUTH_WEST // TODO: zones
+}
+
+model InstitutionProfile {
+  id String @id @default(cuid())
+  institutionName String
+  acronym String
+  address String
+  lat Int
+  long Int
+  state String
+  zone Zone
+  email String @unique
+  phoneNumber String
+  avatarUrl String
+  members MemberProfile[]
+  excos ExcoProfile[]
+  patrons PatronProfile[]
+  activities Activity[]
+  events Event[]
+
+  stateProfileId String
+  stateProfile StateProfile @relation(fields: [stateProfileId], references: [id])
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExcoProfile {
+  id String @id @default(cuid())
+  firstName String
+  lastName String
+  otherNames String // TODO: Optional?
+  courseOfStudy String
+  post String
+  occupation String
+  graduationStatus GraduationStatus
+  graduationDate DateTime
+  stateOfOrigin String
+  stateOfResidence String
+  email String
+  phoneNumber String
+  avatarUrl String
+
+  eventId String
+  events Event @relation(fields: [eventId], references: [id]) // cascade ?
+
+  institutionId String
+  institution InstitutionProfile @relation(fields: [institutionId], references: [id])
+  stateProfileId String
+  stateProfile StateProfile @relation(fields: [stateProfileId], references: [id])
+  zoneProfileId String
+  zoneProfile ZoneProfile @relation(fields: [zoneProfileId], references: [id])
+  necProfileId String
+  necProfile NecProfile @relation(fields: [necProfileId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatronProfile {
+  id String @id @default(cuid())
+  title String
+  firstName String
+  lastName String
+  otherNames String? // TODO: Optional ?
+  occupation String
+  placeOfWork String
+  stateOfResidence String
+  post String
+  email String
+  phoneNumber String
+  avatarUrl String
+  institutionId String
+  institution InstitutionProfile @relation(fields: [institutionId], references: [id])
+  stateProfileId String
+  stateProfile StateProfile @relation(fields: [stateProfileId], references: [id])
+  zoneProfileId String
+  zoneProfile ZoneProfile @relation(fields: [zoneProfileId], references: [id])
+  necProfileId String
+  necProfile NecProfile @relation(fields: [necProfileId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Activity {
+  id String @id @default(cuid())
+  title String
+  venue String
+  time DateTime
+  desc String
+  institutionId String
+  institution InstitutionProfile @relation(fields: [institutionId], references: [id])
+  stateProfileId String
+  stateProfile StateProfile @relation(fields: [stateProfileId], references: [id])
+  zoneProfileId String
+  zoneProfile ZoneProfile @relation(fields: [zoneProfileId], references: [id])
+  necProfileId String
+  necProfile NecProfile @relation(fields: [necProfileId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id String @id @default(cuid())
+  createdBy ExcoProfile[]
+  title String // eventName
+  desc String
+  venue String
+  date DateTime
+  time DateTime
+  estimatedBudget Int // I think
+  institutionId String
+  institution InstitutionProfile @relation(fields: [institutionId], references: [id])
+  stateProfileId String
+  stateProfile StateProfile @relation(fields: [stateProfileId], references: [id])
+  zoneProfileId String
+  zoneProfile ZoneProfile @relation(fields: [zoneProfileId], references: [id])
+  necProfileId String
+  necProfile NecProfile @relation(fields: [necProfileId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StateProfile {
+  id String @id @default(cuid())
+  address String
+  state String
+  zone Zone
+  email String @unique
+  phoneNumber String
+  avatarUrl String
+  institutions InstitutionProfile[]
+  excos ExcoProfile[]
+  patrons PatronProfile[]
+  activities Activity[]
+  events Event[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  zoneProfileId String
+  zoneProfile ZoneProfile @relation(fields: [zoneProfileId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ZoneProfile {
+  id String @id @default(cuid())
+  zone Zone
+  address String
+  email String @unique
+  states StateProfile[]
+  phoneNumber String
+  avatarUrl String
+  activities Activity[]
+  events Event[]
+  excos ExcoProfile[]
+  patrons PatronProfile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NecProfile {
+  id String @id @default(cuid())
+  address String
+  email String @unique
+  phoneNumber String
+  avatarUrl String
+  activities Activity[]
+  events Event[]
+  excos ExcoProfile[]
+  patrons PatronProfile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MailingList {
+  email String @unique
+
+  @@id([email])
+}
+
+model Broadcast {
+  id String @id @default(cuid())
+  title String
+  desc String
+  thumbnailUrl String
+  approvalStatus ApprovalStatus @default(PENDING)
+  author String
+}
+
+enum ApprovalStatus {
+  APPROVED
+  PENDING
+
+}
+
+// model Category {
+//   title String @unique
+//   slug String
+//   user User
+// }
+
+model Comment {
+  id String @id
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  postId String
+  post Post @relation(fields: [postId], references: [id])
+  text String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id String @id @default(cuid())
+  title String
+  desc String
+  thumbnailUrl String
+  author String
+  userLikeId String
+  likedby User @relation("likedPosts", fields: [userLikeId], references: [id])
+  userDislikeId String
+  dislikedBy User @relation("dislikedPosts", fields: [userDislikeId], references: [id])
+  comments Comment[]
+
+  userId String
+  createdBy User @relation("posts", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

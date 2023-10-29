@@ -9,7 +9,6 @@
     "build:dev": "rimraf builds",
     "build": "tsc --outDir ./builds",
     "start:prod": "nodemon ./builds/index.js"
-
   },
   "repository": {
     "type": "git",
