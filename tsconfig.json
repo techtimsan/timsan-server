@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "target": "ESNext",
     "moduleResolution": "Node",
+    "strict": true,
     "rootDir": "./src",
     "outDir": "/builds",
     "resolveJsonModule": true,
