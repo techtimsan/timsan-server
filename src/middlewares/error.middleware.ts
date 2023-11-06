@@ -11,7 +11,7 @@ export const errorMiddleware = (
     err.statusCode = err.statusCode || 500
     err.message = err.message || `Internal Server Error`
 
-    // Define specific errors
+    // Define specific errors 
 
     // wrong jwt
     if (err.name === "JsonWebTokenError") {
