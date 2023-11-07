@@ -21,7 +21,7 @@ export const registerUser = asyncErrorMiddleware(
       const { firstName, lastName, email, password }: RegisterUserData =
         req.body
 
-      const userExists = await prisma.user.findUnique({
+      const emailExists = await prisma.user.findUnique({
         where: {
           email,
         },
@@ -30,32 +30,18 @@ export const registerUser = asyncErrorMiddleware(
         },
       })
 
-      const hashedPassword = await argon2.hash(password)
-
-      if (userExists) {
+      if (emailExists) {
         return res.status(400).json({
           message: "Email Already Exists!",
         })
       }
 
-      const user = await prisma.user.create({
-        data: {
-          email,
-          firstName,
-          lastName,
-          password: hashedPassword,
-        },
-      })
-
       // generate email confirmation token
       const confirmationToken = generateEmailConfirmationToken({
-        id: user.id,
-        emailAddress: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        email,
+        firstName,
+        lastName,
       })
-
-      console.log(confirmationToken)
 
       const templateData = {
         firstName,
@@ -292,7 +278,7 @@ export const getUserById = asyncErrorMiddleware(
         })
       }
 
-      const { password, ...userWithoutPassword  } = user!
+      const { password, ...userWithoutPassword } = user!
 
       res.status(200).json({
         message: "Fetched user successfully!",

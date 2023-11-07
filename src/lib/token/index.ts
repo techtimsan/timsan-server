@@ -78,8 +78,7 @@ export const sendAccessAndRefreshToken = (
 }
 
 export const generateEmailConfirmationToken = (userData: {
-  id: string
-  emailAddress: string
+  email: string
   firstName: string
   lastName: string
 }) => {
