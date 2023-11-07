@@ -15,7 +15,6 @@ import {
   verifyEmailConfirmationToken,
 } from "../lib/token"
 
-
 export const registerUser = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -60,7 +59,7 @@ export const registerUser = asyncErrorMiddleware(
 
       const templateData = {
         firstName,
-        emailConfirmationLink: `${BASE_API_URL}/auth/confirm-email/${confirmationToken}`,
+        emailConfirmationLink: `${BASE_API_URL}/user/confirm-email/${confirmationToken}`,
       }
 
       // send activation email
@@ -95,7 +94,6 @@ export const confirmEmail = asyncErrorMiddleware(
       const { token } = req.params
 
       const user = verifyEmailConfirmationToken(token)
-      console.log("verified email confirmation token successfully! ", user)
 
       if (!user)
         return res.status(401).json({
@@ -188,7 +186,7 @@ export const loginUser = asyncErrorMiddleware(
       } = user
 
       return res.status(200).json({
-        message: "Welcome",
+        message: "Logged in Successfully!",
         data: {
           id,
           emailAddress,
@@ -268,6 +266,37 @@ export const getAllUsers = asyncErrorMiddleware(
       res.status(200).json({
         message: "Fetched Users Successfully!",
         data: users,
+      })
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.message,
+      })
+    }
+  }
+)
+
+export const getUserById = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = req.params
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      })
+
+      if (!user) {
+        res.status(404).json({
+          message: "User does not exist!",
+        })
+      }
+
+      const { password, ...userWithoutPassword  } = user!
+
+      res.status(200).json({
+        message: "Fetched user successfully!",
+        data: userWithoutPassword,
       })
     } catch (error: any) {
       res.status(400).json({

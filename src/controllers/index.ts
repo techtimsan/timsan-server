@@ -3,6 +3,7 @@ export {
   confirmEmail,
   getAllUsers,
   deleteUserById,
+  getUserById
 } from "./auth.service"
 export {
   createNewConference,

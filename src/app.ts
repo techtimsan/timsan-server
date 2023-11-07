@@ -17,7 +17,7 @@ app.set("strict routing", true)
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-// app.use("x-powered-by")
+app.disable("x-powered-by")
 
 // cors options
 // app.use(

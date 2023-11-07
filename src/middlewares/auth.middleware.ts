@@ -44,3 +44,11 @@ export const authorizeUserRoles = (...roles: string[]) => {
     next()
   }
 }
+
+export const isAdmin = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    
+  } catch (error: any) {
+    
+  }
+})
