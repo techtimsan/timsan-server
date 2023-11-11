@@ -54,7 +54,7 @@ export const refreshTokenOptions: AuthTokenOptions = {
 
 // send access token on login
 export const sendAccessAndRefreshToken = (
-  user: { id: string; name: string; email: string },
+  user: { id: string; firstName: string; lastName: string, email: string },
   statusCode: number,
   res: Response
 ) => {
@@ -81,6 +81,7 @@ export const generateEmailConfirmationToken = (userData: {
   email: string
   firstName: string
   lastName: string
+  password: string
 }) => {
   const confirmationToken = jwt.sign(userData, jwt_secret, { expiresIn: "3d" })
 
@@ -92,10 +93,10 @@ export const verifyEmailConfirmationToken = (confirmationToken: string) => {
     const decoded = jwt.verify(confirmationToken, jwt_secret)
 
     return decoded as {
-      id: string
       firstName: string
       email: string
       lastName: string
+      password: string
       iat: number
       exp: number
     }

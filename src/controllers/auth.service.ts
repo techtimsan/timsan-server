@@ -12,6 +12,7 @@ import {
   accessTokenOptions,
   generateEmailConfirmationToken,
   refreshTokenOptions,
+  sendAccessAndRefreshToken,
   verifyEmailConfirmationToken,
 } from "../lib/token"
 
@@ -41,6 +42,7 @@ export const registerUser = asyncErrorMiddleware(
         email,
         firstName,
         lastName,
+        password,
       })
 
       const templateData = {
@@ -60,6 +62,7 @@ export const registerUser = asyncErrorMiddleware(
         res.status(201).json({
           success: true,
           message: `Kindly check your email to activate your account`,
+          token: confirmationToken,
         })
       } catch (error: any) {
         res.status(400).json({
@@ -79,35 +82,34 @@ export const confirmEmail = asyncErrorMiddleware(
     try {
       const { token } = req.params
 
-      const user = verifyEmailConfirmationToken(token)
+      const verifiedUser = verifyEmailConfirmationToken(token)
 
-      if (!user)
+      if (!verifiedUser)
         return res.status(401).json({
           message: "Invalid Token",
         })
 
-      // update user in DB
-      const userEmailConfirmed = await prisma.user.update({
-        where: {
-          id: user.id,
-        },
+      const { firstName, lastName, email, password } = verifiedUser
+
+      const hashedPassword = await argon2.hash(password)
+
+      const user = await prisma.user.create({
         data: {
-          // no need for emailToken?
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword,
           emailVerified: true,
         },
       })
 
-      const { id, email, firstName, lastName } = userEmailConfirmed
-
       res.status(200).json({
         message: "Email Address Confirmed 😎",
         data: {
-          id,
-          email,
-          firstName,
-          lastName,
-          iat: user.iat,
-          exp: user.exp,
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
         },
       })
     } catch (error: any) {
@@ -154,14 +156,11 @@ export const loginUser = asyncErrorMiddleware(
 
       const isPassword = await argon2.verify(user.password, password)
 
-      if (!isPassword) {
+      if (user && !isPassword) {
         return res.status(401).json({
           message: "Invalid Credentials! 😠",
         })
       }
-
-      const accessToken = ""
-      const refreshToken = ""
 
       const {
         id,
@@ -171,16 +170,7 @@ export const loginUser = asyncErrorMiddleware(
         lastName,
       } = user
 
-      return res.status(200).json({
-        message: "Logged in Successfully!",
-        data: {
-          id,
-          emailAddress,
-          emailVerified,
-          firstName,
-          lastName,
-        },
-      })
+      sendAccessAndRefreshToken({ id, firstName, lastName, email }, 200, res)
     } catch (error: any) {
       res.status(500).json({
         message: error.message,
@@ -197,7 +187,7 @@ export const logoutUser = asyncErrorMiddleware(
       res.cookie("refresh_token", "", { maxAge: 1 })
 
       // delete redis store value
-      const userId = req.user?.id
+      // const userId = req.user?.id
       // redisStore.del(userId)
 
       res.status(200).json({
@@ -247,16 +237,26 @@ export const logoutUser = asyncErrorMiddleware(
 export const getAllUsers = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await prisma.user.findMany()
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          conferences: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
 
       res.status(200).json({
         message: "Fetched Users Successfully!",
         data: users,
       })
     } catch (error: any) {
-      res.status(400).json({
-        message: error.message,
-      })
+      return next(new ErrorHandler(error.message, 400))
     }
   }
 )

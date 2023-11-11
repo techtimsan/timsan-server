@@ -7,21 +7,24 @@ import { verifyAccessOrRefreshToken } from "../lib/token"
 export const isAuthenticated = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const accessToken = req.cookies.access_token as string
+      const accessToken = req.cookies!.access_token as string
 
       if (!accessToken)
-        return next(new ErrorHandler("Login to Access Resource", 401))
+        res.status(401).json({
+          message: "Login to Access Resource. ",
+        })
 
       const decoded = verifyAccessOrRefreshToken(accessToken, access_token)
 
       if (!decoded) return next(new ErrorHandler("Invalid Access Token", 400))
 
-    //   const user = await redisStore.get(decoded.user.id)
+      //   const user = await redisStore.get(decoded.user.id)
 
-    //   if (!user) return next(new ErrorHandler("User does not exist", 400))
+      const user = decoded.user
 
-    //   req.user = JSON.parse(user)
+      //   if (!user) return next(new ErrorHandler("User does not exist", 400))
 
+      req.user.id = user.id
       next()
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))
@@ -45,10 +48,9 @@ export const authorizeUserRoles = (...roles: string[]) => {
   }
 }
 
-export const isAdmin = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    
-  } catch (error: any) {
-    
+export const isAdmin = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+    } catch (error: any) {}
   }
-})
+)
