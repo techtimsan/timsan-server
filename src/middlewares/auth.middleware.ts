@@ -3,6 +3,7 @@ import { asyncErrorMiddleware } from "./asyncError.middleware"
 import { ErrorHandler } from "../utils"
 import { access_token } from "../lib/constants"
 import { verifyAccessOrRefreshToken } from "../lib/token"
+import { redisStore } from "../lib/redis"
 
 export const isAuthenticated = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -18,13 +19,11 @@ export const isAuthenticated = asyncErrorMiddleware(
 
       if (!decoded) return next(new ErrorHandler("Invalid Access Token", 400))
 
-      //   const user = await redisStore.get(decoded.user.id)
+      const user = await redisStore.get(decoded.user.id)
 
-      const user = decoded.user
+      if (!user) return next(new ErrorHandler("User does not exist", 400))
 
-      //   if (!user) return next(new ErrorHandler("User does not exist", 400))
-
-      req.user.id = user.id
+      req.user = JSON.parse(user)
       next()
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))

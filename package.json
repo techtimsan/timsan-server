@@ -7,8 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon src/index.ts",
     "build:dev": "rimraf builds",
+    "build:prod": "",
     "build": "tsc --outDir ./builds",
-    "start:prod": "nodemon ./builds/index.js"
+    "start:prod": "node ./builds/index.js"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "@typescript-eslint/parser": "^6.9.0",
     "argon2": "^0.31.1",
     "bullmq": "^4.12.6",
+    "cloudinary": "^1.41.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

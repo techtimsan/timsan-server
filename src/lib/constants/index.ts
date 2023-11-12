@@ -3,6 +3,8 @@ dotenv.config()
 
 export const envConfig = dotenv
 
+export const CORS_ORIGIN = process.env.CORS_ORIGIN as string
+
 export const PORT = Number(process.env.PORT || 3000)
 
 export const BASE_API_URL = `/api/v1`
@@ -31,3 +33,6 @@ export const SMTP_PORT = Number(process.env.SMTP_PORT)
 export const SMTP_HOST = process.env.SMTP_HOST as string
 export const SMTP_SERVICE = process.env.SMTP_SERVICE as string
 export const SMTP_PASSWORD = process.env.SMTP_PASSWORD as string
+
+export const EXTERNAL_REDIS_URL = process.env.EXTERNAL_REDIS_URL as string
+// export const INTERNAL_REDIS_URL = process.env.INTERNAL_REDIS_URL as string

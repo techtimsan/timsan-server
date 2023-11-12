@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser"
 import { AUTH_ROUTE, CONFERENCE_ROUTE } from "./lib/constants"
 import { authRoute, conferenceRoute } from "./routes"
 import { ErrorHandler } from "./utils"
+import { errorMiddleware } from "./middlewares"
 
 export const app: Express = express()
 
@@ -20,13 +21,13 @@ app.use(express.urlencoded({ extended: false }))
 app.disable("x-powered-by")
 
 // cors options
-// app.use(
-//   cors({
-//     origin: "*",
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-//     credentials: true,
-//   })
-// )
+app.use(
+  cors({
+    origin: "*", // CORS_ORIGIN
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+)
 
 // cookies
 app.use(cookieParser())
@@ -55,9 +56,10 @@ app.use(CONFERENCE_ROUTE, conferenceRoute)
 // })
 
 // Catch 404 and forward to error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack)
-  res.status(400).json({
-    message: "Invalid Request"
-  })
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+  const err = new Error(`${req.method} - ${req.url.split("/").slice(0, -1).join("/")} not found!`) as any
+  err.statusCode = 404
+  next(err)
 })
+
+app.use(errorMiddleware)

@@ -5,7 +5,8 @@ export {
   deleteUserById,
   getUserById,
   loginUser,
-  logoutUser
+  logoutUser,
+  refreshAccessToken
 } from "./auth.service"
 export {
   createNewConference,
