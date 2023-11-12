@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "emailToken" DROP NOT NULL,
+ALTER COLUMN "refreshToken" DROP NOT NULL,
+ALTER COLUMN "emailVerified" SET DEFAULT false,
+ALTER COLUMN "profileStatus" SET DEFAULT 'NOT_COMPLETED';
