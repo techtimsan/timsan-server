@@ -5,17 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
-    "start": "nodemon src/index.ts",
-    "start:prod": "node ./dist/index.js",
-    "build": "rimraf dist && tsc"
-=======
     "start:dev": "nodemon src/index.ts",
     "build:dev": "rimraf builds",
     "build:prod": "",
     "build": "tsc --outDir ./builds",
     "start:prod": "node ./builds/index.js"
->>>>>>> main
   },
   "repository": "git+https://bitbucket.org/techtimsan/timsan_server_v2.git",
   "keywords": [
