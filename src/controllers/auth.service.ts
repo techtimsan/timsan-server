@@ -26,6 +26,7 @@ import {
 import { redisStore } from "../lib/redis"
 import jwt from "jsonwebtoken"
 import { cloudUpload } from "../lib/upload"
+import { checkSchema } from "express-validator"
 
 export const registerUser = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -34,7 +35,7 @@ export const registerUser = asyncErrorMiddleware(
         req.body
 
       const emailSent = await redisStore.get(email)
-      console.log(JSON.stringify(emailSent))
+      
 
       if (emailSent)
         return next(new ErrorHandler("Confirmation Email Already sent", 400))
@@ -142,8 +143,9 @@ export const confirmEmail = asyncErrorMiddleware(
   }
 )
 
-export const loginUser = asyncErrorMiddleware(
-  async (req: Request, res: Response, next: NextFunction) => {
+export const loginUser = 
+asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+  
     try {
       const { email, password }: LoginUserData = req.body
 
@@ -255,6 +257,7 @@ export const refreshAccessToken = asyncErrorMiddleware(
         accessToken,
       })
     } catch (error: any) {
+      
       return next(new ErrorHandler(error.message, 400))
     }
   }
@@ -354,7 +357,7 @@ export const resetPassword = asyncErrorMiddleware(
       const userId = req.user?.id
 
       if (!userId) {
-        return next(new ErrorHandler("", 400))
+        return next(new ErrorHandler("Not Authenticated", 400))
       }
 
       const user = await prisma.user.findFirst({
@@ -372,7 +375,7 @@ export const resetPassword = asyncErrorMiddleware(
       const isPasswordMatch = argon2.verify(oldPassword, user.password)
 
       if (!isPasswordMatch)
-        return next(new ErrorHandler("Incorrect Password", 400))
+        return next(new ErrorHandler("Invalid Credentials", 400))
 
       const updatedUser = await prisma.user.update({
         where: {

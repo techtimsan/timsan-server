@@ -30,7 +30,7 @@ export const isAuthenticated = asyncErrorMiddleware(
     }
   }
 )
-
+ 
 // user roles
 export const authorizeUserRoles = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -53,3 +53,23 @@ export const isAdmin = asyncErrorMiddleware(
     } catch (error: any) {}
   }
 )
+
+type EndpointFields = {
+  [endpoint: string]: string[]
+}
+
+export const validateFields = (requiredFields: EndpointFields) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const endpoint = req.path
+
+    if (requiredFields) {
+      const missingFields = requiredFields[endpoint].filter((field) => !(field in req.body))
+
+      if (missingFields.length > 0) {
+        return next(new ErrorHandler(`Missing required fields for ${endpoint}: ${missingFields.join(", ")}`, 400))
+      }
+    }
+
+    next()
+  }
+}
