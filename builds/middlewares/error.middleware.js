@@ -6,7 +6,7 @@ const errorMiddleware = (err, req, res, next) => {
     try {
         err.statusCode = err.statusCode || 500;
         err.message = err.message || `Internal Server Error`;
-        // Define specific errors
+        // Define specific errors 
         // wrong jwt
         if (err.name === "JsonWebTokenError") {
             const message = `Unauthorized - Invalid Access Token!`;
