@@ -51,9 +51,12 @@ app.use(AUTH_ROUTE, authRoute)
 app.use(CONFERENCE_ROUTE, conferenceRoute)
 
 // healthcheck
-// app.get("/", (req: Request, res: Response, next: NextFunction) => {
-//   return next()
-// })
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+res.status(200).json({
+  status: "success",
+  message: "Welcome! I hope you're Authorized to be here!!!"
+})
+})
 
 // Catch 404 and forward to error handler
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

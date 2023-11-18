@@ -25,6 +25,11 @@ export const errorMiddleware = (
       err = new ErrorHandler(message, 400)
     }
 
+    if (err.name === "ZodError") {
+      const message = `Missing Required Fields`+
+      err = new ErrorHandler(message, 400)
+    }
+
     return res.status(err.statusCode).json({
       success: false,
       message: `${err.message}`,
