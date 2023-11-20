@@ -9,6 +9,7 @@ import { RegisterUserSchema } from "../lib/validate/auth"
 import { LoginUserData, RegisterUserData } from "../types/app"
 import {
   BASE_API_URL,
+  BASE_SERVER_URL,
   access_token,
   access_token_expire,
   refresh_token,
@@ -26,7 +27,8 @@ import {
 import { redisStore } from "../lib/redis"
 import jwt from "jsonwebtoken"
 import { cloudUpload } from "../lib/upload"
-import { checkSchema } from "express-validator"
+import argon from "argon2"
+
 
 export const registerUser = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -34,9 +36,9 @@ export const registerUser = asyncErrorMiddleware(
       const { firstName, lastName, email, password }: RegisterUserData =
         req.body
 
+      // email / user exists 
       const emailSent = await redisStore.get(email)
       
-
       if (emailSent)
         return next(new ErrorHandler("Confirmation Email Already sent", 400))
 
@@ -52,45 +54,55 @@ export const registerUser = asyncErrorMiddleware(
       if (emailExists)
         return next(new ErrorHandler("Email already exists", 400))
 
+      const hashedPassword = await argon.hash(password)
+
+      // create new user
+      const user = await prisma.user.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword
+        }
+      })
+
+      const {firstName: firstname, lastName: lastname, email: emailAddress, emailVerified} = user
+
       // generate email confirmation token
       const confirmationToken = generateEmailConfirmationToken({
-        email,
-        firstName,
-        lastName,
-        password,
+        email: emailAddress,
+        firstName: firstname,
+        lastName: lastname,
       })
 
       const templateData = {
         firstName,
-        emailConfirmationLink: `http://localhost:3000${BASE_API_URL}/user/confirm-email/${confirmationToken}`,
+        emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/confirm-email/${confirmationToken}`,
       }
 
-      // send activation email
-      try {
-        await sendEmail({
+      // expires in 3 days
+      const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000
+
+      // save new user to redis
+       const redisUserData = await redisStore.set(
+        email,
+        JSON.stringify({ firstName, lastName, email, emailVerified: false, token: confirmationToken, expiresAt })
+      )
+
+      // send activation email    
+      const emailSuccess = await sendEmail({
           emailAddress: email,
           subject: "Account Activation",
           template: "activation-mail.ejs",
           data: templateData,
         })
 
-        // save new user to redis
-        const newUser = await redisStore.set(
-          email.trim(),
-          JSON.stringify({ firstName, lastName, email, emailVerified: false, token: confirmationToken })
-        )
-
         res.status(201).json({
           success: true,
-          message: `Kindly check your email to activate your account`,
-          token: confirmationToken, // remove later?
-        })
-      } catch (error: any) {
-        res.status(400).json({
-          error: error.message,
-        })
-      }
+          message: `Check your mail to verify your email address`,
+        })   
     } catch (error: any) {
+      console.log(error)
       return res.status(500).json({
         error: error.message,
       })
@@ -103,37 +115,37 @@ export const confirmEmail = asyncErrorMiddleware(
     try {
       const { token } = req.params
 
-      // if !token TODO:
+      const verifiedToken = verifyEmailConfirmationToken(token)
 
-      const verifiedUser = verifyEmailConfirmationToken(token)
-
-      if (!verifiedUser)
+      if (!verifiedToken)
         return res.status(401).json({
           message: "Invalid Token",
         })
 
-      const { firstName, lastName, email, password } = verifiedUser
+      const { firstName, lastName, email } = verifiedToken
 
-      const hashedPassword = await argon2.hash(password)
+      // email already verified
+      const emailAlreadyVerified = await redisStore.get(email)
 
-      const user = await prisma.user.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          password: hashedPassword,
-          emailVerified: true,
-        },
-      })
+      if (!emailAlreadyVerified) {
+        const verifiedUser = await prisma.user.update({
+          where: {
+            email
+          },
+          data: {
+            emailVerified: true
+          }
+        })
+  
+        res.status(200).json({
+          message: "Email Address Verified 😎",
+          
+        })
+      }
 
-      res.status(200).json({
-        message: "Email Address Confirmed 😎",
-        data: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
+      res.status(400).json({
+        status: "failed",
+        message: "Email already verified"
       })
     } catch (error: any) {
       return res.status(500).json({

@@ -81,7 +81,6 @@ export const generateEmailConfirmationToken = (userData: {
   email: string
   firstName: string
   lastName: string
-  password: string
 }) => {
   const confirmationToken = jwt.sign(userData, jwt_secret, { expiresIn: "3d" })
 
@@ -96,7 +95,6 @@ export const verifyEmailConfirmationToken = (confirmationToken: string) => {
       firstName: string
       email: string
       lastName: string
-      password: string
       iat: number
       exp: number
     }

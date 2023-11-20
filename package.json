@@ -9,7 +9,7 @@
     "build:dev": "rimraf builds",
     "build:prod": "",
     "build": "tsc --outDir ./builds",
-    "start:prod": "node ./builds/index.js"
+    "start:prod": "pm2 start ./builds/index.js"
   },
   "repository": "git+https://bitbucket.org/techtimsan/timsan_server_v2.git",
   "keywords": [
@@ -55,6 +55,7 @@
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.1",
     "otp-generator": "^4.0.1",
+    "pm2": "^5.3.0",
     "prisma": "^5.5.2",
     "rate-limiter-flexible": "^3.0.2",
     "rimraf": "^5.0.5",

@@ -1,47 +1,56 @@
 import { NextFunction, Request, Response } from "express"
 import { Schema, z } from "zod"
 import { ErrorHandler } from "../../utils"
+import {ZodIssue, ZodError} from 'zod'
+
+// custom zod error formatter
+const formatZodIssue = (issue: ZodIssue): string => {
+  const { path, message } = issue
+  const pathString = path.join('.')
+
+  return `${pathString}: ${message}`
+}
+
+// Format the Zod error message with only the current error
+export const formatZodError = (error: ZodError) => {
+  const { issues } = error
+
+  if (issues.length) {
+      const currentIssue = issues[0]
+
+      return formatZodIssue(currentIssue)
+  }
+
+  return null
+}
 
 export const RegisterUserSchema = z.object({
   firstName: z
-    .string()
-    .refine((data) => data.trim() !== "", "Enter a Valid FirstName"),
-  lastName: z.string().min(3, "Enter a Valid LastName"),
-  email: z.string().email({ message: "Invalid Email Address" }),
+    .string().min(3),
+  lastName: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(6)
 })
-
-export const validateRegisterUserData =
-  (schema: Schema) => (req: Request, res: Response, next: NextFunction) => {
-    try {
-      schema.parse({
-        ...req.body,
-      })
-
-      next()
-    } catch (error: any) {
-      console.log(error)
-      res.status(400).json({
-        message: error,
-      })
-    }
-  }
 
 export const LoginUserSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  password: z.string().min(6),
 })
 
-export const validateLoginUserData =
-  (schema: Schema) => (req: Request, res: Response, next: NextFunction) => {
+export const validateData =
+  (schema: Schema) => async (req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parseAsync({
-        body: req.body,
-        // query: req.query,
-        // params: req.params
+      schema.parse({
+        ...req.body,
+        ...req.params,
+        ...req.query
       })
 
       next()
     } catch (error: any) {
-      return next(new ErrorHandler(error, 400))
+      // console.log(error)
+      return next(new ErrorHandler(formatZodError(error) as string, 400))
     }
   }
+
+
