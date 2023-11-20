@@ -1,6 +1,6 @@
 import { NextFunction, Response, Router, Request } from "express"
 import { validateRequestBody } from "zod-express-middleware"
-import { LoginUserSchema, RegisterUserSchema, validateLoginUserData, validateRegisterUserData } from "../lib/validate/auth"
+import { LoginUserSchema, RegisterUserSchema, validateData } from "../lib/validate/auth"
 import { registerUser, confirmEmail, getAllUsers, deleteUserById, getUserById, loginUser, logoutUser, refreshAccessToken } from "../controllers"
 import { isAuthenticated, validateFields } from "../middlewares"
 // import {body, query, param, checkSchema} from 'express-validator'
@@ -17,13 +17,14 @@ const tester = async (req: Request, res: Response, next: NextFunction) => {
   next()
 }
 
-authRoute.get("/",isAuthenticated, getAllUsers)
+authRoute.get("/", getAllUsers)
 authRoute.post(
   "/register",
+  validateData(RegisterUserSchema),
   registerUser
 )
 authRoute.get("/confirm-email/:token", confirmEmail) // post?
-authRoute.post("/login", validateLoginUserData(LoginUserSchema), loginUser)
+authRoute.post("/login", validateData(LoginUserSchema), loginUser)
 // authRoute.get("/verify-email/:accessToken")
 authRoute.get("/logout", isAuthenticated, logoutUser)
 authRoute.get("/refresh-token", refreshAccessToken)

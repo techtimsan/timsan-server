@@ -7,7 +7,7 @@ export const CORS_ORIGIN = process.env.CORS_ORIGIN as string
 
 export const PORT = Number(process.env.PORT || 3000)
 
-export const BASE_SERVER_URL = process.env.BASE_SERVER_URL
+export const BASE_SERVER_URL = process.env.NODE_ENV === "production" ? process.env.BASE_SERVER_URL_PROD as string : process.env.BASE_SERVER_URL_DEV as string
 export const BASE_API_URL = `/api/v1`
 
 export const AUTH_ROUTE = `${BASE_API_URL}/user`
@@ -18,6 +18,7 @@ export const access_token_expire = parseInt(
   process.env.ACCESS_TOKEN_EXPIRE || "300",
   10
 )
+
 export const refresh_token = process.env.REFRESH_TOKEN as string
 export const refresh_token_expire = parseInt(
   process.env.REFRESH_TOKEN_EXPIRE || "1200",

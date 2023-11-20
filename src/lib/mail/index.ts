@@ -22,6 +22,8 @@ const mailConfig = {
 
 export const mailTransporter = mailer.createTransport(mailConfig)
 
+// mailTransporter.verify
+
 export const sendEmail = async (options: SendActivationCodeMailOptions) => {
   const { emailAddress, subject, template, data } = options
 
@@ -36,13 +38,13 @@ export const sendEmail = async (options: SendActivationCodeMailOptions) => {
     to: emailAddress,
     subject,
     html,
-    attachments: [
-      {
-        filename: "timsan_logo.png",
-        path: logoPath,
-        cid: "logo",
-      },
-    ],
+    // attachments: [
+    //   {
+    //     filename: "timsan_logo.png",
+    //     path: logoPath,
+    //     // cid: "logo",
+    //   },
+    // ],
   }
 
   await mailTransporter.sendMail(mailOptions)
