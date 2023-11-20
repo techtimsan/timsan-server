@@ -34,12 +34,14 @@ export const LoginUserSchema = z.object({
 export const validateLoginUserData =
   (schema: Schema) => (req: Request, res: Response, next: NextFunction) => {
     try {
-      schema.parse({
-        ...req.body,
+      schema.parseAsync({
+        body: req.body,
+        // query: req.query,
+        // params: req.params
       })
 
       next()
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400))
+      return next(new ErrorHandler(error, 400))
     }
   }
