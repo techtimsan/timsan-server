@@ -18,23 +18,16 @@ const mailConfig = {
     },
 };
 exports.mailTransporter = nodemailer_1.default.createTransport(mailConfig);
+// mailTransporter.verify
 const sendEmail = async (options) => {
     const { emailAddress, subject, template, data } = options;
     const templatePath = path_1.default.join(__dirname, "../mail", template);
     const html = await ejs_1.default.renderFile(templatePath, data);
-    const logoPath = path_1.default.join(__dirname, "../../assets/timsan_logo.png");
     const mailOptions = {
         from: constants_1.SMTP_EMAIL,
         to: emailAddress,
         subject,
-        html,
-        attachments: [
-            {
-                filename: "timsan_logo.png",
-                path: logoPath,
-                cid: "logo",
-            },
-        ],
+        html
     };
     await exports.mailTransporter.sendMail(mailOptions);
 };

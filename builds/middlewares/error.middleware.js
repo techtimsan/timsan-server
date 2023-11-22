@@ -17,6 +17,10 @@ const errorMiddleware = (err, req, res, next) => {
             const message = `Unauthorized - Acess Token Expired!`;
             err = new utils_1.ErrorHandler(message, 400);
         }
+        if (err.name === "ZodError") {
+            const message = `Missing Required Fields`;
+            err = new utils_1.ErrorHandler(message, 400);
+        }
         return res.status(err.statusCode).json({
             success: false,
             message: `${err.message}`,
