@@ -15,3 +15,22 @@ export {
   registerForConference,
   deleteConferenceById,
 } from "./conference.service"
+
+export {
+  //news
+  createNewsPost,
+  editNewsPost,
+  deleteNewsPost,
+  getNewsPostById,
+  getAllNewsPosts,
+  
+  
+  //broadcasts
+  createBroadcast,
+  editBroadcast,
+  deleteBroadcast,
+  getAllBroadcasts,
+  getBroadcastById,
+
+
+} from "./newsAndBroadcast.service"

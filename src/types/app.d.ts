@@ -4,8 +4,18 @@ declare global {
   namespace Express {
     interface Request {
       user?: User
+      file?: FileUploadFormat
     }
   }
+}
+
+export interface FileUploadFormat {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  path: string;
 }
 
 export type SendActivationCodeMailOptions = {
@@ -87,4 +97,22 @@ export type ConferenceRegisterData = {
   attendeeId: string
   membershipType: "TIMSANITE" | "IOTB" | "OTHERS"
   paymentStatus: "PAYMENT_SUCCESSFUL" | "PAYMENT_PENDING"
+}
+
+export type PostData = {
+  title: string,
+  desc: string,
+  thumbnailUrl: string,
+  author: string,
+  userLikeId: string,
+  userDislikeId: string,
+  userId: string,
+}
+
+export type BroadcastData = {
+  title: string,
+  desc: string,
+  thumbnailUrl: string,
+  author: string,
+
 }

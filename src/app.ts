@@ -2,8 +2,8 @@ import express, { Express, Request, Response, NextFunction } from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { AUTH_ROUTE, CONFERENCE_ROUTE } from "./lib/constants"
-import { authRoute, conferenceRoute } from "./routes"
+import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
+import { authRoute, conferenceRoute, newsRoute } from "./routes"
 import { ErrorHandler } from "./utils"
 import { errorMiddleware } from "./middlewares"
 
@@ -49,6 +49,7 @@ app.use(morgan("dev"))
 // route endpoint
 app.use(AUTH_ROUTE, authRoute)
 app.use(CONFERENCE_ROUTE, conferenceRoute)
+app.use(NEWS_ROUTE, newsRoute)
 
 // healthcheck
 app.get("/", (req: Request, res: Response, next: NextFunction) => {

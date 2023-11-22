@@ -37,13 +37,31 @@ export const LoginUserSchema = z.object({
   password: z.string().min(6),
 })
 
+export const CreateNewsSchema = z.object({
+  title: z.string().min(5),
+  desc: z.string().min(5),
+  author: z.string().min(3),
+  userId: z.string().min(3),
+  userLikeId: z.string().min(0),
+  userDislikeId: z.string().min(0),
+  // thumbnailUrl: z.string().min(6)
+})
+
+export const CreateBroadCastSchema = z.object({
+  title: z.string().min(5),
+  desc: z.string().min(5),
+  author: z.string().min(3),
+  // thumbnailUrl: z.string().min(6)
+})
+
 export const validateData =
   (schema: Schema) => async (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse({
         ...req.body,
         ...req.params,
-        ...req.query
+        ...req.query,
+        ...req.file
       })
 
       next()
