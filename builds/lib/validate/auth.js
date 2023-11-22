@@ -1,43 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateLoginUserData = exports.LoginUserSchema = exports.validateRegisterUserData = exports.RegisterUserSchema = void 0;
+exports.validateData = exports.LoginUserSchema = exports.RegisterUserSchema = exports.formatZodError = void 0;
 const zod_1 = require("zod");
 const utils_1 = require("../../utils");
+// custom zod error formatter
+const formatZodIssue = (issue) => {
+    const { path, message } = issue;
+    const pathString = path.join('.');
+    return `${pathString}: ${message}`;
+};
+// Format the Zod error message with only the current error
+const formatZodError = (error) => {
+    const { issues } = error;
+    if (issues.length) {
+        const currentIssue = issues[0];
+        return formatZodIssue(currentIssue);
+    }
+    return null;
+};
+exports.formatZodError = formatZodError;
 exports.RegisterUserSchema = zod_1.z.object({
     firstName: zod_1.z
-        .string()
-        .refine((data) => data.trim() !== "", "Enter a Valid FirstName"),
-    lastName: zod_1.z.string().min(3, "Enter a Valid LastName"),
-    email: zod_1.z.string().email({ message: "Invalid Email Address" }),
+        .string().min(3),
+    lastName: zod_1.z.string().min(3),
+    email: zod_1.z.string().email(),
+    password: zod_1.z.string().min(6)
 });
-const validateRegisterUserData = (schema) => (req, res, next) => {
-    try {
-        schema.parse({
-            ...req.body,
-        });
-        next();
-    }
-    catch (error) {
-        console.log(error);
-        res.status(400).json({
-            message: error,
-        });
-    }
-};
-exports.validateRegisterUserData = validateRegisterUserData;
 exports.LoginUserSchema = zod_1.z.object({
     email: zod_1.z.string().email(),
-    password: zod_1.z.string(),
+    password: zod_1.z.string().min(6),
 });
-const validateLoginUserData = (schema) => (req, res, next) => {
+const validateData = (schema) => async (req, res, next) => {
     try {
         schema.parse({
             ...req.body,
+            ...req.params,
+            ...req.query
         });
         next();
     }
     catch (error) {
-        return next(new utils_1.ErrorHandler(error.message, 400));
+        // console.log(error)
+        return next(new utils_1.ErrorHandler((0, exports.formatZodError)(error), 400));
     }
 };
-exports.validateLoginUserData = validateLoginUserData;
+exports.validateData = validateData;

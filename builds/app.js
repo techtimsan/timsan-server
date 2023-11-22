@@ -43,9 +43,12 @@ exports.app.use((0, morgan_1.default)("dev"));
 exports.app.use(constants_1.AUTH_ROUTE, routes_1.authRoute);
 exports.app.use(constants_1.CONFERENCE_ROUTE, routes_1.conferenceRoute);
 // healthcheck
-// app.get("/", (req: Request, res: Response, next: NextFunction) => {
-//   return next()
-// })
+exports.app.get("/", (req, res, next) => {
+    res.status(200).json({
+        status: "success",
+        message: "Welcome! I hope you're Authorized to be here!!!"
+    });
+});
 // Catch 404 and forward to error handler
 exports.app.all("*", (req, res, next) => {
     const err = new Error(`${req.method} - ${req.url.split("/").slice(0, -1).join("/")} not found!`);

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAdmin = exports.authorizeUserRoles = exports.isAuthenticated = void 0;
+exports.validateFields = exports.isAdmin = exports.authorizeUserRoles = exports.isAuthenticated = void 0;
 const asyncError_middleware_1 = require("./asyncError.middleware");
 const utils_1 = require("../utils");
 const constants_1 = require("../lib/constants");
@@ -41,3 +41,16 @@ exports.isAdmin = (0, asyncError_middleware_1.asyncErrorMiddleware)(async (req, 
     }
     catch (error) { }
 });
+const validateFields = (requiredFields) => {
+    return (req, res, next) => {
+        const endpoint = req.path;
+        if (requiredFields) {
+            const missingFields = requiredFields[endpoint].filter((field) => !(field in req.body));
+            if (missingFields.length > 0) {
+                return next(new utils_1.ErrorHandler(`Missing required fields for ${endpoint}: ${missingFields.join(", ")}`, 400));
+            }
+        }
+        next();
+    };
+};
+exports.validateFields = validateFields;

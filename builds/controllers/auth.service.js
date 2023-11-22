@@ -14,13 +14,10 @@ const token_1 = require("../lib/token");
 const redis_1 = require("../lib/redis");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const upload_1 = require("../lib/upload");
+const argon2_2 = __importDefault(require("argon2"));
 exports.registerUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
         const { firstName, lastName, email, password } = req.body;
-        const emailSent = await redis_1.redisStore.get(email);
-        console.log(JSON.stringify(emailSent));
-        if (emailSent)
-            return next(new utils_1.ErrorHandler("Confirmation Email Already sent", 400));
         const emailExists = await db_1.prisma.user.findUnique({
             where: {
                 email,
@@ -30,41 +27,46 @@ exports.registerUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, 
             },
         });
         if (emailExists)
-            return next(new utils_1.ErrorHandler("Email already exists", 400));
+            return next(new utils_1.ErrorHandler("User already exists", 400));
+        const hashedPassword = await argon2_2.default.hash(password);
+        // create new user
+        const user = await db_1.prisma.user.create({
+            data: {
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword
+            }
+        });
+        const { firstName: firstname, lastName: lastname, email: emailAddress, emailVerified } = user;
         // generate email confirmation token
         const confirmationToken = (0, token_1.generateEmailConfirmationToken)({
-            email,
-            firstName,
-            lastName,
-            password,
+            email: emailAddress,
+            firstName: firstname,
+            lastName: lastname,
         });
         const templateData = {
             firstName,
-            emailConfirmationLink: `http://localhost:3000${constants_1.BASE_API_URL}/user/confirm-email/${confirmationToken}`,
+            emailConfirmationLink: `${constants_1.BASE_SERVER_URL}${constants_1.BASE_API_URL}/user/confirm-email/${confirmationToken}`,
         };
-        // send activation email
-        try {
-            await (0, mail_1.sendEmail)({
-                emailAddress: email,
-                subject: "Account Activation",
-                template: "activation-mail.ejs",
-                data: templateData,
-            });
-            // save new user to redis
-            const newUser = await redis_1.redisStore.set(email.trim(), JSON.stringify({ firstName, lastName, email, emailVerified: false, token: confirmationToken }));
-            res.status(201).json({
-                success: true,
-                message: `Kindly check your email to activate your account`,
-                token: confirmationToken, // remove later?
-            });
-        }
-        catch (error) {
-            res.status(400).json({
-                error: error.message,
-            });
-        }
+        // expires in 3 days
+        const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000;
+        // save new user to redis
+        const redisUserData = await redis_1.redisStore.set(email, JSON.stringify({ firstName, lastName, email, emailVerified: false, token: confirmationToken, expiresAt }));
+        // send activation email    
+        const emailSuccess = await (0, mail_1.sendEmail)({
+            emailAddress: email,
+            subject: "Account Activation",
+            template: "activation-mail.ejs",
+            data: templateData,
+        });
+        res.status(201).json({
+            success: true,
+            message: `Check your mail to verify your email address`,
+        });
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json({
             error: error.message,
         });
@@ -73,31 +75,30 @@ exports.registerUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, 
 exports.confirmEmail = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
         const { token } = req.params;
-        // if !token TODO:
-        const verifiedUser = (0, token_1.verifyEmailConfirmationToken)(token);
-        if (!verifiedUser)
+        const verifiedToken = (0, token_1.verifyEmailConfirmationToken)(token);
+        if (!verifiedToken)
             return res.status(401).json({
                 message: "Invalid Token",
             });
-        const { firstName, lastName, email, password } = verifiedUser;
-        const hashedPassword = await argon2_1.default.hash(password);
-        const user = await db_1.prisma.user.create({
-            data: {
-                firstName,
-                lastName,
-                email,
-                password: hashedPassword,
-                emailVerified: true,
-            },
-        });
-        res.status(200).json({
-            message: "Email Address Confirmed 😎",
-            data: {
-                id: user.id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-            },
+        const { firstName, lastName, email } = verifiedToken;
+        // email already verified
+        const emailAlreadyVerified = await redis_1.redisStore.get(email);
+        if (!emailAlreadyVerified) {
+            const verifiedUser = await db_1.prisma.user.update({
+                where: {
+                    email
+                },
+                data: {
+                    emailVerified: true
+                }
+            });
+            res.status(200).json({
+                message: "Email Address Verified 😎",
+            });
+        }
+        res.status(400).json({
+            status: "failed",
+            message: "Email already verified"
         });
     }
     catch (error) {
@@ -268,7 +269,7 @@ exports.resetPassword = (0, middlewares_1.asyncErrorMiddleware)(async (req, res,
         const { oldPassword, newPassword, } = req.body;
         const userId = req.user?.id;
         if (!userId) {
-            return next(new utils_1.ErrorHandler("", 400));
+            return next(new utils_1.ErrorHandler("Not Authenticated", 400));
         }
         const user = await db_1.prisma.user.findFirst({
             where: {
@@ -282,7 +283,7 @@ exports.resetPassword = (0, middlewares_1.asyncErrorMiddleware)(async (req, res,
         }
         const isPasswordMatch = argon2_1.default.verify(oldPassword, user.password);
         if (!isPasswordMatch)
-            return next(new utils_1.ErrorHandler("Incorrect Password", 400));
+            return next(new utils_1.ErrorHandler("Invalid Credentials", 400));
         const updatedUser = await db_1.prisma.user.update({
             where: {
                 id: user.id,
