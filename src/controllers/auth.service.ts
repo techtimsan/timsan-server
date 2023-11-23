@@ -36,6 +36,12 @@ export const registerUser = asyncErrorMiddleware(
       const { firstName, lastName, email, password }: RegisterUserData =
         req.body
 
+      // email / user exists 
+      const emailSent = await redisStore.get(email)
+      
+      if (emailSent)
+        return next(new ErrorHandler("Confirmation Email Already sent", 400))
+
       const emailExists = await prisma.user.findUnique({
         where: {
           email,
@@ -46,7 +52,7 @@ export const registerUser = asyncErrorMiddleware(
       })
 
       if (emailExists)
-        return next(new ErrorHandler("User already exists", 400))
+        return next(new ErrorHandler("Email already exists", 400))
 
       const hashedPassword = await argon.hash(password)
 

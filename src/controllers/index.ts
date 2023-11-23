@@ -32,5 +32,7 @@ export {
   getAllBroadcasts,
   getBroadcastById,
 
+  //test
+  testingCloudUpload,
 
 } from "./newsAndBroadcast.service"

@@ -41,9 +41,9 @@ export const CreateNewsSchema = z.object({
   title: z.string().min(5),
   desc: z.string().min(5),
   author: z.string().min(3),
-  userId: z.string().min(3),
-  userLikeId: z.string().min(0),
-  userDislikeId: z.string().min(0),
+  // userId: z.string().min(3),
+  // userLikeId: z.string().min(0),
+  // userDislikeId: z.string().min(0),
   // thumbnailUrl: z.string().min(6)
 })
 

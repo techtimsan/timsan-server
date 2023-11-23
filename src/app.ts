@@ -15,7 +15,8 @@ app.set("case sensitive routing", true)
 // // enable strict routing
 app.set("strict routing", true)
 
-app.use(express.json())
+// app.use(express.json())
+app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false }))
 
 app.disable("x-powered-by")

@@ -3,7 +3,7 @@ import { asyncErrorMiddleware } from "../middlewares";
 import { BroadcastData, FileUploadFormat, PostData } from "../types/app";
 import { prisma } from "../lib/db";
 import { ErrorHandler } from "../utils";
-import {uploadToCloudinary} from "../lib/upload";
+import {cloudUpload, uploadToCloudinary} from "../lib/upload";
 
 
 /**
@@ -73,7 +73,7 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
                 author,
                 userLikeId: "",
                 userDislikeId: "",
-                userId: id
+                userId: "123456"
             }
         })
         if (newsPost){
@@ -84,6 +84,7 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
             });
         }
     } catch (error: any) {
+        console.error("kini error yen", error)
         return next(new ErrorHandler('Internal Server Error', 500));
       }
 })
@@ -96,9 +97,9 @@ export const editNewsPost = asyncErrorMiddleware(async (req: Request, res: Respo
             title,
             desc,
             author,
-            userId,
-            userLikeId,
-            userDislikeId,
+            // userId,
+            // userLikeId,
+            // userDislikeId,
         }: PostData = req.body;
 
         const post = await prisma.post.findFirst({
@@ -122,9 +123,9 @@ export const editNewsPost = asyncErrorMiddleware(async (req: Request, res: Respo
                 desc,
                 thumbnailUrl,
                 author,
-                userId,
-                userLikeId,
-                userDislikeId,
+                // userId,
+                // userLikeId,
+                // userDislikeId,
             },
         });
         if (updatedPost) {
@@ -323,3 +324,33 @@ export const deleteBroadcast = asyncErrorMiddleware(async (req: Request, res: Re
         return next(new ErrorHandler('Internal Server Error', 500));
     }
 });
+
+
+
+export const testingCloudUpload = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // let thumbnailUrl = '';
+        if (req.file) {
+            const file = req.body.file;
+            const binaryData = Buffer.from(file, 'base64');
+            const thumbnailUrl = await cloudUpload.uploader.upload(binaryData.toString("utf-8"), {
+                folder: "test-folder",
+              })
+              
+              res.status(201).json({ 
+                  success: true,
+                  message: 'Cloudinary is working', 
+                  data: thumbnailUrl
+        })} 
+    } catch (error: any) {
+        console.error("kini error yen", error)
+        return next(new ErrorHandler('Internal Server Error', 500));
+      }
+})
+
+
+//   // Specify the path where you want to save the file
+//   const filePath = path.join(__dirname, 'uploads', fileName);
+
+//   // Write the binary data to the file
+//   fs.writeFile(filePath, binaryDa

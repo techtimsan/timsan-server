@@ -3,9 +3,9 @@ import { FileUploadFormat } from "../../types/app";
 
 
 cloudinary.config({ 
-    cloud_name: '', 
-    api_key: '', 
-    api_secret: '',
+    cloud_name: "drcsdfkjr", 
+    api_key: "365776684397868", 
+    api_secret: 'mR9etvE4CBw16p-Yw0nBDd1VLqY',
     secure: true
   });
 

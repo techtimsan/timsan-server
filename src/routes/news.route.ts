@@ -1,7 +1,7 @@
 import { NextFunction, Response, Router, Request } from "express"
 import { validateRequestBody } from "zod-express-middleware"
 import { CreateBroadCastSchema, CreateNewsSchema, validateData } from "../lib/validate/auth"
-import { createNewsPost, deleteNewsPost, editNewsPost, getAllNewsPosts, getNewsPostById } from "../controllers"
+import { createNewsPost, deleteNewsPost, editNewsPost, getAllNewsPosts, getNewsPostById, testingCloudUpload } from "../controllers"
 
 
 export const newsRoute = Router({
@@ -20,3 +20,4 @@ newsRoute.get("/:postId", getNewsPostById)
 newsRoute.post("/createPost", validateData(CreateNewsSchema),  createNewsPost)
 newsRoute.patch("/editPost/:postId", validateData(CreateNewsSchema), editNewsPost)
 newsRoute.delete("/:postId", deleteNewsPost)
+newsRoute.post("/uploadTester", testingCloudUpload)

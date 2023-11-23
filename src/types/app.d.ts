@@ -104,9 +104,9 @@ export type PostData = {
   desc: string,
   thumbnailUrl: string,
   author: string,
-  userLikeId: string,
-  userDislikeId: string,
-  userId: string,
+  // userLikeId: string,
+  // userDislikeId: string,
+  // userId: string,
 }
 
 export type BroadcastData = {
