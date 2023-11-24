@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateData = exports.LoginUserSchema = exports.RegisterUserSchema = exports.formatZodError = void 0;
+exports.validateData = exports.CreateBroadCastSchema = exports.CreateNewsSchema = exports.LoginUserSchema = exports.RegisterUserSchema = exports.formatZodError = void 0;
 const zod_1 = require("zod");
 const utils_1 = require("../../utils");
 // custom zod error formatter
@@ -30,12 +30,28 @@ exports.LoginUserSchema = zod_1.z.object({
     email: zod_1.z.string().email(),
     password: zod_1.z.string().min(6),
 });
+exports.CreateNewsSchema = zod_1.z.object({
+    title: zod_1.z.string().min(5),
+    desc: zod_1.z.string().min(5),
+    author: zod_1.z.string().min(3),
+    // userId: z.string().min(3),
+    // userLikeId: z.string().min(0),
+    // userDislikeId: z.string().min(0),
+    // thumbnailUrl: z.string().min(6)
+});
+exports.CreateBroadCastSchema = zod_1.z.object({
+    title: zod_1.z.string().min(5),
+    desc: zod_1.z.string().min(5),
+    author: zod_1.z.string().min(3),
+    // thumbnailUrl: z.string().min(6)
+});
 const validateData = (schema) => async (req, res, next) => {
     try {
         schema.parse({
             ...req.body,
             ...req.params,
-            ...req.query
+            ...req.query,
+            ...req.file
         });
         next();
     }

@@ -30,6 +30,7 @@ export type RegisterUserData = {
   lastName: string
   email: string
   password: string
+  accountType: "MEMBER" | "INSTITUTION" | "STATE" | "ZONAL" | "NEC"
 }
 
 export type LoginUserData = {

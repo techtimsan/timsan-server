@@ -25,6 +25,7 @@ export const formatZodError = (error: ZodError) => {
 }
 
 export const RegisterUserSchema = z.object({
+  accountType: z.enum(['MEMBER', 'INSTITUTION', 'STATE', 'ZONAL', 'NEC']),
   firstName: z
     .string().min(3),
   lastName: z.string().min(3),

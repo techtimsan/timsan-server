@@ -4,7 +4,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
 import { authRoute, conferenceRoute, newsRoute } from "./routes"
-import { ErrorHandler } from "./utils"
+import path from 'path'
 import { errorMiddleware } from "./middlewares"
 
 export const app: Express = express()
@@ -34,6 +34,10 @@ app.use(
 app.use(cookieParser())
 
 app.use(morgan("dev"))
+
+// Set the view engine to EJS
+app.set("views", path.join(__dirname, "/lib/mail"))
+app.set('view engine', 'ejs');
 
 // error handler
 // app.use(async (req: Request, res: Response, next: NextFunction) => {

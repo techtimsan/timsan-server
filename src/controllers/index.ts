@@ -1,12 +1,13 @@
 export {
   registerUser,
-  confirmEmail,
+  verifyEmail,
   getAllUsers,
   deleteUserById,
   getUserById,
   loginUser,
   logoutUser,
-  refreshAccessToken
+  refreshAccessToken,
+  resendVerificationEmail
 } from "./auth.service"
 export {
   createNewConference,
