@@ -106,7 +106,7 @@ export type PostData = {
   author: string,
   // userLikeId: string,
   // userDislikeId: string,
-  // userId: string,
+  userId: string,
 }
 
 export type BroadcastData = {

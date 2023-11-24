@@ -33,6 +33,6 @@ export {
   getBroadcastById,
 
   //test
-  testingCloudUpload,
+  // testingCloudUpload,
 
 } from "./newsAndBroadcast.service"

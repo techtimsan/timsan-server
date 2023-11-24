@@ -55,7 +55,7 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
             title, 
             desc,
             author, 
-            // userId 
+            userId,
             // userLikeId,
             // userDislikeId,
         }: PostData = req.body
@@ -63,7 +63,7 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
         let thumbnailUrl = '';
         if (req.file) {
             const file: FileUploadFormat = req.file;
-            thumbnailUrl = await uploadToCloudinary(file, 'news-thumbnails');
+            thumbnailUrl = await uploadToCloudinary(file, 'news-thumbnails', userId);
         }
         const newsPost = await prisma.post.create({
             data: {
@@ -71,9 +71,9 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
                 desc,
                 thumbnailUrl,
                 author,
-                userLikeId: "",
-                userDislikeId: "",
-                userId: "123456"
+                userLikeId: "clpb2wy4l0000nzt7t6ugs74s",
+                userDislikeId: "clpb2wy4l0000nzt7t6ugs74s",
+                userId
             }
         })
         if (newsPost){
@@ -92,7 +92,7 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
 export const editNewsPost = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { postId } = req.params;
-        
+        const userId = "" //for testing
         const {
             title,
             desc,
@@ -109,10 +109,10 @@ export const editNewsPost = asyncErrorMiddleware(async (req: Request, res: Respo
         })
         if (!post) return next(new ErrorHandler("Post not found", 404))
         
-        let thumbnailUrl = '';
+        let thumbnailUrl = post.thumbnailUrl;
         if (req.file) {
             const file: FileUploadFormat = req.file;
-            thumbnailUrl = await uploadToCloudinary(file, 'news-thumbnails');
+            thumbnailUrl = await uploadToCloudinary(file, 'news-thumbnails', userId);
         }
         const updatedPost = await prisma.post.update({
             where: {
@@ -217,6 +217,7 @@ export const getAllBroadcasts = asyncErrorMiddleware(async (req: Request, res: R
 
 export const createBroadcast = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const userId = "" //for testing
         const {
             title, 
             desc,
@@ -226,7 +227,7 @@ export const createBroadcast = asyncErrorMiddleware(async (req: Request, res: Re
         let thumbnailUrl = ''
         if (req.file) {
             const file: FileUploadFormat = req.file;
-            thumbnailUrl = await uploadToCloudinary(file, 'broadcast-thumbnails');
+            thumbnailUrl = await uploadToCloudinary(file, 'broadcast-thumbnails', userId);
         }
         const broadcast = await prisma.broadcast.create({
             data: {
@@ -252,17 +253,12 @@ export const editBroadcast = asyncErrorMiddleware(async (req: Request, res: Resp
     try {
         const { broadcastId } = req.params;
         
+        const userId = "" //for testing
         const {
             title, 
             desc,
             author
         }: BroadcastData = req.body
-
-        let thumbnailUrl = ''
-        if (req.file) {
-            const file: FileUploadFormat = req.file;
-            thumbnailUrl = await uploadToCloudinary(file, 'broadcast-thumbnails');
-        }
 
         const broadcast = await prisma.broadcast.findFirst({
             where: {
@@ -271,6 +267,12 @@ export const editBroadcast = asyncErrorMiddleware(async (req: Request, res: Resp
         })
         if (!broadcast) return next(new ErrorHandler("Broadcast not found", 404))
         
+        let thumbnailUrl = broadcast.thumbnailUrl
+        if (req.file) {
+            const file: FileUploadFormat = req.file;
+            thumbnailUrl = await uploadToCloudinary(file, 'broadcast-thumbnails', userId);
+        }
+
         const updatedBroadcast = await prisma.broadcast.update({
             where: {
                 id: broadcastId
@@ -327,30 +329,25 @@ export const deleteBroadcast = asyncErrorMiddleware(async (req: Request, res: Re
 
 
 
-export const testingCloudUpload = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        // let thumbnailUrl = '';
-        if (req.file) {
-            const file = req.body.file;
-            const binaryData = Buffer.from(file, 'base64');
-            const thumbnailUrl = await cloudUpload.uploader.upload(binaryData.toString("utf-8"), {
-                folder: "test-folder",
-              })
-              
-              res.status(201).json({ 
-                  success: true,
-                  message: 'Cloudinary is working', 
-                  data: thumbnailUrl
-        })} 
-    } catch (error: any) {
-        console.error("kini error yen", error)
-        return next(new ErrorHandler('Internal Server Error', 500));
-      }
-})
-
-
-//   // Specify the path where you want to save the file
-//   const filePath = path.join(__dirname, 'uploads', fileName);
-
-//   // Write the binary data to the file
-//   fs.writeFile(filePath, binaryDa
+// export const testingCloudUpload = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         // let thumbnailUrl = '';
+//         if (req.file) {
+//             const uploadedFile: FileUploadFormat = req.file;
+//             const thumbnails = await uploadToCloudinary(uploadedFile, "test-folder")
+//             if (thumbnails){
+//                 res.status(201).json({ 
+//                     success: true,
+//                     message: 'Cloudinary is working', 
+//                     data: thumbnails
+//                 })
+//             }
+//             } else{
+//                 return res.status(400).json({ success: false, message: 'No file uploaded.' });
+//             } 
+//         }
+//         catch (error: any) {
+//         console.error("kini error yen", error)
+//         return next(new ErrorHandler('Internal Server Error', 500));
+//       }
+// })

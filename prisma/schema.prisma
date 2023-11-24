@@ -257,16 +257,17 @@ model Post {
   desc          String
   thumbnailUrl  String
   author        String
-  userLikeId    String
-  userDislikeId String
+  userLikeId    String?   @default("") // Nullable with default value of empty string
+  userDislikeId String?   @default("") // Nullable with default value of empty string
   userId        String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   comments      Comment[]
-  dislikedBy    User      @relation("dislikedPosts", fields: [userDislikeId], references: [id])
+  dislikedBy    User?     @relation("dislikedPosts", fields: [userDislikeId], references: [id])
   createdBy     User      @relation("posts", fields: [userId], references: [id])
-  likedby       User      @relation("likedPosts", fields: [userLikeId], references: [id])
+  likedby       User?     @relation("likedPosts", fields: [userLikeId], references: [id])
 }
+
 
 model Conference {
   id           String               @id @default(cuid())
