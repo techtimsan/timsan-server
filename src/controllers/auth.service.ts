@@ -104,7 +104,7 @@ export const registerUser = asyncErrorMiddleware(
 
           const templateData = {
             firstName,
-            emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${confirmationToken}`,
+            emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${email}/${confirmationToken}`,
           }
 
           // send activation email
@@ -119,6 +119,7 @@ export const registerUser = asyncErrorMiddleware(
             success: true,
             message: `Check your mail to verify your email address`,
             result: redisUserData,
+            link: templateData.emailConfirmationLink
           })
           break
 
@@ -149,7 +150,7 @@ export const verifyEmail = asyncErrorMiddleware(
       if (!emailExists) {
         const errorMessage = "Email does not exist"
         res.redirect(
-          `/api/v1/user/verified/error=false&message=${errorMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified/error=false&message=${errorMessage}`
         )
       }
 
@@ -170,7 +171,7 @@ export const verifyEmail = asyncErrorMiddleware(
       if (!verifiedToken) {
         const errorMessage = "Invalid Confirmation Token"
         res.redirect(
-          `/api/v1/user/verified/error=false&message=${errorMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified/error=false&message=${errorMessage}`
         )
       }
 
@@ -208,10 +209,10 @@ export const verifyEmail = asyncErrorMiddleware(
 export const emailVerified = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error, message } = req.params
+      // const { error, message } = req.params
       res.render("email-verified", {
-        error,
-        message,
+        error: false,
+        message: "Hello there",
       })
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))

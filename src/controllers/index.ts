@@ -7,7 +7,8 @@ export {
   loginUser,
   logoutUser,
   refreshAccessToken,
-  resendVerificationEmail
+  resendVerificationEmail,
+  emailVerified
 } from "./auth.service"
 export {
   createNewConference,

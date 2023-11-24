@@ -2,15 +2,10 @@ import express, { Express, Request, Response, NextFunction } from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-<<<<<<< HEAD
 import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
 import { authRoute, conferenceRoute, newsRoute } from "./routes"
 import path from 'path'
-=======
-import { AUTH_ROUTE, BROADCAST_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
-import { authRoute, broadcastRoute, conferenceRoute, newsRoute } from "./routes"
 import { ErrorHandler } from "./utils"
->>>>>>> bfa77ca4522c236bc4d40df28f2b4594facfb2ee
 import { errorMiddleware } from "./middlewares"
 
 export const app: Express = express()
@@ -61,7 +56,7 @@ app.set('view engine', 'ejs');
 app.use(AUTH_ROUTE, authRoute)
 app.use(CONFERENCE_ROUTE, conferenceRoute)
 app.use(NEWS_ROUTE, newsRoute)
-app.use(BROADCAST_ROUTE, broadcastRoute)
+// app.use(BROADCAST_ROUTE, broadcastRoute)
 
 // healthcheck
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
