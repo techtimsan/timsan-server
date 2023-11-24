@@ -162,7 +162,7 @@ export const verifyEmail = asyncErrorMiddleware(
       if (expired) {
         const errorMessage = "Confirmation Token already expired"
         res.redirect(
-          `/api/v1/user/verified/error=false&message=${errorMessage}`
+          `/api/v1/user/verified/error=true&message=${errorMessage}`
         )
       }
 
@@ -171,7 +171,7 @@ export const verifyEmail = asyncErrorMiddleware(
       if (!verifiedToken) {
         const errorMessage = "Invalid Confirmation Token"
         res.redirect(
-          `${BASE_SERVER_URL}/api/v1/user/verified/error=false&message=${errorMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified/error=true&message=${errorMessage}`
         )
       }
 
@@ -190,13 +190,13 @@ export const verifyEmail = asyncErrorMiddleware(
         const successMessage = "Email Verified Successfully"
 
         res.redirect(
-          `/api/v1/user/verified/error=false&message=${successMessage}`
+          `/api/v1/user/verified?error=false&message=${successMessage}`
         )
       }
 
       const verifiedMessage = "Email Already Verified"
       res.redirect(
-        `/api/v1/user/verified/error=false&message=${verifiedMessage}`
+        `/api/v1/user/verified/error=true&message=${verifiedMessage}`
       )
     } catch (error: any) {
       return res.status(500).json({
@@ -209,10 +209,10 @@ export const verifyEmail = asyncErrorMiddleware(
 export const emailVerified = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const { error, message } = req.params
+      const { error, message } = req.query
       res.render("email-verified", {
-        error: false,
-        message: "Hello there",
+        error,
+        message,
       })
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))

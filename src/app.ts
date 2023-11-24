@@ -37,8 +37,8 @@ app.use(cookieParser())
 app.use(morgan("dev"))
 
 // Set the view engine to EJS
-app.set("views", path.join(__dirname, "/lib/mail"))
 app.set('view engine', 'ejs');
+app.set("views", path.join(__dirname, "/lib/mail"))
 
 // error handler
 // app.use(async (req: Request, res: Response, next: NextFunction) => {
