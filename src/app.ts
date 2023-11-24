@@ -2,8 +2,9 @@ import express, { Express, Request, Response, NextFunction } from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { AUTH_ROUTE, BROADCAST_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
-import { authRoute, broadcastRoute, conferenceRoute, newsRoute } from "./routes"
+import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
+import { authRoute, conferenceRoute, newsRoute } from "./routes"
+import path from 'path'
 import { ErrorHandler } from "./utils"
 import { errorMiddleware } from "./middlewares"
 
@@ -35,6 +36,10 @@ app.use(cookieParser())
 
 app.use(morgan("dev"))
 
+// Set the view engine to EJS
+app.set("views", path.join(__dirname, "/lib/mail"))
+app.set('view engine', 'ejs');
+
 // error handler
 // app.use(async (req: Request, res: Response, next: NextFunction) => {
 //   try {
@@ -51,7 +56,7 @@ app.use(morgan("dev"))
 app.use(AUTH_ROUTE, authRoute)
 app.use(CONFERENCE_ROUTE, conferenceRoute)
 app.use(NEWS_ROUTE, newsRoute)
-app.use(BROADCAST_ROUTE, broadcastRoute)
+// app.use(BROADCAST_ROUTE, broadcastRoute)
 
 // healthcheck
 app.get("/", (req: Request, res: Response, next: NextFunction) => {

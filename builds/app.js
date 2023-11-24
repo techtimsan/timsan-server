@@ -16,7 +16,8 @@ exports.app = (0, express_1.default)();
 exports.app.set("case sensitive routing", true);
 // // enable strict routing
 exports.app.set("strict routing", true);
-exports.app.use(express_1.default.json());
+// app.use(express.json())
+exports.app.use(express_1.default.json({ limit: '50mb' }));
 exports.app.use(express_1.default.urlencoded({ extended: false }));
 exports.app.disable("x-powered-by");
 // cors options
@@ -42,6 +43,7 @@ exports.app.use((0, morgan_1.default)("dev"));
 // route endpoint
 exports.app.use(constants_1.AUTH_ROUTE, routes_1.authRoute);
 exports.app.use(constants_1.CONFERENCE_ROUTE, routes_1.conferenceRoute);
+exports.app.use(constants_1.NEWS_ROUTE, routes_1.newsRoute);
 // healthcheck
 exports.app.get("/", (req, res, next) => {
     res.status(200).json({

@@ -18,6 +18,10 @@ const argon2_2 = __importDefault(require("argon2"));
 exports.registerUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
         const { firstName, lastName, email, password } = req.body;
+        // email / user exists 
+        const emailSent = await redis_1.redisStore.get(email);
+        if (emailSent)
+            return next(new utils_1.ErrorHandler("Confirmation Email Already sent", 400));
         const emailExists = await db_1.prisma.user.findUnique({
             where: {
                 email,
@@ -27,7 +31,7 @@ exports.registerUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, 
             },
         });
         if (emailExists)
-            return next(new utils_1.ErrorHandler("User already exists", 400));
+            return next(new utils_1.ErrorHandler("Email already exists", 400));
         const hashedPassword = await argon2_2.default.hash(password);
         // create new user
         const user = await db_1.prisma.user.create({
