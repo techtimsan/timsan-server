@@ -13,6 +13,7 @@ export const BASE_API_URL = `/api/v1`
 export const AUTH_ROUTE = `${BASE_API_URL}/user`
 export const CONFERENCE_ROUTE = `${BASE_API_URL}/conference`
 export const NEWS_ROUTE = `${BASE_API_URL}/news`
+export const BROADCAST_ROUTE = `${BASE_API_URL}/broadcast`
 
 export const access_token = process.env.ACCESS_TOKEN as string
 export const access_token_expire = parseInt(
@@ -39,3 +40,9 @@ export const SMTP_PASSWORD = process.env.SMTP_PASSWORD as string
 
 export const EXTERNAL_REDIS_URL = process.env.EXTERNAL_REDIS_URL as string
 // export const INTERNAL_REDIS_URL = process.env.INTERNAL_REDIS_URL as string
+
+
+//CLOUDINARY
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME as string
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY as string
+export const CLOUNDINAR_SECRET_KEY = process.env.CLOUNDINAR_SECRET_KEY as string
