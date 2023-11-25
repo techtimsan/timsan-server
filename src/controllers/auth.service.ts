@@ -150,19 +150,20 @@ export const verifyEmail = asyncErrorMiddleware(
       if (!emailExists) {
         const errorMessage = "Email does not exist"
         res.redirect(
-          `${BASE_SERVER_URL}/api/v1/user/verified/error=false&message=${errorMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`
         )
       }
 
       // check if token is not expired
-      const { expiresAt } = JSON.parse(JSON.stringify(email))
+      const userData = JSON.parse(JSON.stringify(emailExists))
 
-      const expired = Date.now() === expiresAt
+      const expired = Date.now() > userData.expiresAt
+      console.log(userData.expiresAt)
 
       if (expired) {
         const errorMessage = "Confirmation Token already expired"
         res.redirect(
-          `/api/v1/user/verified/error=true&message=${errorMessage}`
+          `/api/v1/user/verified?error=true&message=${errorMessage}`
         )
       }
 
@@ -171,7 +172,7 @@ export const verifyEmail = asyncErrorMiddleware(
       if (!verifiedToken) {
         const errorMessage = "Invalid Confirmation Token"
         res.redirect(
-          `${BASE_SERVER_URL}/api/v1/user/verified/error=true&message=${errorMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`
         )
       }
 
@@ -187,17 +188,20 @@ export const verifyEmail = asyncErrorMiddleware(
           },
         })
 
+        // update redis data
+        const updatedRedisUserData = await redisStore.hset(email, "emailVerified", "true")
+
         const successMessage = "Email Verified Successfully"
 
         res.redirect(
           `/api/v1/user/verified?error=false&message=${successMessage}`
         )
+      } else {
+        const verifiedMessage = "Email Already Verified"
+        res.redirect(
+          `/api/v1/user/verified?error=true&message=${verifiedMessage}`
+        )
       }
-
-      const verifiedMessage = "Email Already Verified"
-      res.redirect(
-        `/api/v1/user/verified/error=true&message=${verifiedMessage}`
-      )
     } catch (error: any) {
       return res.status(500).json({
         error: error.message,
@@ -210,8 +214,11 @@ export const emailVerified = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { error, message } = req.query
+
+      const errorStatus = error === "true" ? true : false
+    
       res.render("email-verified", {
-        error,
+        error: errorStatus,
         message,
       })
     } catch (error: any) {

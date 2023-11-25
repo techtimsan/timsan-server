@@ -4,7 +4,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
 import { authRoute, conferenceRoute, newsRoute } from "./routes"
-import path from 'path'
+import path from "path"
 import { ErrorHandler } from "./utils"
 import { errorMiddleware } from "./middlewares"
 
@@ -17,7 +17,7 @@ app.set("case sensitive routing", true)
 app.set("strict routing", true)
 
 // app.use(express.json())
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }))
 app.use(express.urlencoded({ extended: false }))
 
 app.disable("x-powered-by")
@@ -37,7 +37,7 @@ app.use(cookieParser())
 app.use(morgan("dev"))
 
 // Set the view engine to EJS
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "/lib/mail"))
 
 // error handler
@@ -52,25 +52,27 @@ app.set("views", path.join(__dirname, "/lib/mail"))
 //   }
 // })
 
+// error handler middleware
+app.use(errorMiddleware)
+// healthcheck
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  res.status(200).json({
+    status: "success",
+    message: "Welcome! I hope you're Authorized to be here!!!",
+  })
+})
+
 // route endpoint
 app.use(AUTH_ROUTE, authRoute)
 app.use(CONFERENCE_ROUTE, conferenceRoute)
 app.use(NEWS_ROUTE, newsRoute)
 // app.use(BROADCAST_ROUTE, broadcastRoute)
 
-// healthcheck
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-res.status(200).json({
-  status: "success",
-  message: "Welcome! I hope you're Authorized to be here!!!"
-})
-})
-
 // Catch 404 and forward to error handler
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
-  const err = new Error(`${req.method} - ${req.url.split("/").slice(0, -1).join("/")} not found!`) as any
+  const err = new Error(
+    `${req.method} - ${req.url.split("/").slice(0, -1).join("/")} not found!`
+  ) as any
   err.statusCode = 404
   next(err)
 })
-
-app.use(errorMiddleware)
