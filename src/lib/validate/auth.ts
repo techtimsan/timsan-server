@@ -55,6 +55,10 @@ export const CreateBroadCastSchema = z.object({
   // thumbnailUrl: z.string().min(6)
 })
 
+export const resendVerificationLinkSchema = z.object({
+  email: z.string().email()
+})
+
 export const validateData =
   (schema: Schema) => async (req: Request, res: Response, next: NextFunction) => {
     try {

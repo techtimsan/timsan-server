@@ -1,7 +1,7 @@
 import { NextFunction, Response, Router, Request } from "express"
 import { validateRequestBody } from "zod-express-middleware"
-import { LoginUserSchema, RegisterUserSchema, validateData } from "../lib/validate/auth"
-import { registerUser, getAllUsers, deleteUserById, getUserById, loginUser, logoutUser, refreshAccessToken, verifyEmail, emailVerified } from "../controllers"
+import { LoginUserSchema, RegisterUserSchema, resendVerificationLinkSchema, validateData } from "../lib/validate/auth"
+import { registerUser, getAllUsers, deleteUserById, getUserById, loginUser, logoutUser, refreshAccessToken, verifyEmail, emailVerified, resendVerificationEmail } from "../controllers"
 import { isAuthenticated, validateFields } from "../middlewares"
 // import {body, query, param, checkSchema} from 'express-validator'
 
@@ -33,5 +33,6 @@ authRoute.get("/:userId", getUserById)
 authRoute.post("/forgot-password")
 authRoute.patch("/reset-password/:accessToken")
 authRoute.delete("/:userId", deleteUserById)
+authRoute.post("/resendVerificationLink", validateData(resendVerificationLinkSchema), resendVerificationEmail)
 
 // email verification
