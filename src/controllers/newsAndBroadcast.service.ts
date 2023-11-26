@@ -50,14 +50,11 @@ export const getAllNewsPosts = asyncErrorMiddleware(async (req: Request, res: Re
 
 export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { id } = req.params
+        const userId = req.user?.id as string
         const {
             title, 
             desc,
             author, 
-            userId,
-            // userLikeId,
-            // userDislikeId,
         }: PostData = req.body
 
         let thumbnailUrl = '';
@@ -71,9 +68,9 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
                 desc,
                 thumbnailUrl,
                 author,
-                userLikeId: "clpb2wy4l0000nzt7t6ugs74s",
-                userDislikeId: "clpb2wy4l0000nzt7t6ugs74s",
-                userId
+                userLikeId: userId,
+                userDislikeId: userId,
+                userId,
             }
         })
         if (newsPost){
@@ -92,14 +89,11 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
 export const editNewsPost = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { postId } = req.params;
-        const userId = "" //for testing
+        const userId = req.user?.id as string
         const {
             title,
             desc,
             author,
-            // userId,
-            // userLikeId,
-            // userDislikeId,
         }: PostData = req.body;
 
         const post = await prisma.post.findFirst({
@@ -123,9 +117,6 @@ export const editNewsPost = asyncErrorMiddleware(async (req: Request, res: Respo
                 desc,
                 thumbnailUrl,
                 author,
-                // userId,
-                // userLikeId,
-                // userDislikeId,
             },
         });
         if (updatedPost) {

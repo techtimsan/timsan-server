@@ -11,7 +11,9 @@ import { ErrorHandler } from "../utils"
 export const createMemberProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params
+      const userId = req.user?.id as string
+      const email = req.user?.email as string
+      
       const {
         firstName,
         lastName,
@@ -26,14 +28,14 @@ export const createMemberProfile = asyncErrorMiddleware(
         stateOfOrigin,
         stateOfResidence,
         phoneNumber,
-        email,
         institutionProfileId
       }: MemberProfileData = req.body
-
-       let avatarUrl = ''
+      
+      
+      let avatarUrl = ''
         if (req.file) {
             const file: FileUploadFormat = req.file;
-            avatarUrl = await uploadToCloudinary(file, 'member-profile', id);
+            avatarUrl = await uploadToCloudinary(file, 'member-profile', userId);
         }
 
       const newMemberProfile = await prisma.memberProfile.create({
@@ -53,7 +55,7 @@ export const createMemberProfile = asyncErrorMiddleware(
           phoneNumber,
           email,
           avatarUrl,
-          userId: id,
+          userId,
           institutionProfileId
         },
       })
@@ -75,10 +77,11 @@ export const createMemberProfile = asyncErrorMiddleware(
 export const editMemberProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const userId = req.user?.id as string
+      const email = req.user?.email as string
       
       const existingProfile = await prisma.memberProfile.findUnique({
-        where: { id },
+        where: { id: userId },
       });
   
       if (!existingProfile) {
@@ -98,17 +101,16 @@ export const editMemberProfile = asyncErrorMiddleware(
         stateOfOrigin,
         stateOfResidence,
         phoneNumber,
-        email,
         institutionProfileId
       }: MemberProfileData = req.body;
 
       let avatarUrl = existingProfile.avatarUrl;
       if (req.file) {
         const file: FileUploadFormat = req.file;
-        avatarUrl = await uploadToCloudinary(file, 'member-profile', id);
+        avatarUrl = await uploadToCloudinary(file, 'member-profile', userId);
       }
       const updatedMemberProfile = await prisma.memberProfile.update({
-        where: { id },
+        where: { id: userId },
         data: {
           firstName,
           lastName,
@@ -145,9 +147,9 @@ export const editMemberProfile = asyncErrorMiddleware(
 export const getMemberProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const userId = req.user?.id as string
       const userProfile = await prisma.memberProfile.findUnique({
-        where: { id },
+        where: { id: userId },
       });
   
       if (!userProfile) {
@@ -172,7 +174,8 @@ export const getMemberProfile = asyncErrorMiddleware(
 
 export const createInstitutionProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params
+    const userId = req.user?.id as string
+    const email = req.user?.email as string
     try {
 
       const {
@@ -182,7 +185,6 @@ export const createInstitutionProfile = asyncErrorMiddleware(
         long, 
         state,
         zone,
-        email,
         phoneNumber,
         stateProfileId,
         institutionName,
@@ -191,7 +193,7 @@ export const createInstitutionProfile = asyncErrorMiddleware(
       let avatarUrl = ''
       if (req.file) {
           const file: FileUploadFormat = req.file;
-          avatarUrl = await uploadToCloudinary(file, 'institution-profile', id);
+          avatarUrl = await uploadToCloudinary(file, 'institution-profile', userId);
       }
 
       const institutionExists = await prisma.institutionProfile.findFirst({
@@ -215,14 +217,15 @@ export const createInstitutionProfile = asyncErrorMiddleware(
           stateProfileId,
           institutionName,
           avatarUrl,
-          userId: id,
+          userId
         }
       })
       if (newInstitutionProfile) {
         res.status(200).json({
             success: true,
             message: 'Institution Profile created successfully',
-            newInstitutionProfile        });
+            newInstitutionProfile
+          });
       } else {
           return next(new ErrorHandler('Something went wrong creating profile', 500));
       }
