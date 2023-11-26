@@ -53,15 +53,6 @@ app.set("views", path.join(__dirname, "/lib/mail"))
 //   }
 // })
 
-// error handler middleware
-app.use(errorMiddleware)
-// healthcheck
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({
-    status: "success",
-    message: "Welcome! I hope you're Authorized to be here!!!",
-  })
-})
 
 // route endpoint
 app.use(AUTH_ROUTE, authRoute)
@@ -69,6 +60,14 @@ app.use(CONFERENCE_ROUTE, conferenceRoute)
 app.use(NEWS_ROUTE, newsRoute)
 app.use(REDIS_ROUTE, redisRoute)
 // app.use(BROADCAST_ROUTE, broadcastRoute)
+
+// healthcheck
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  res.status(200).json({
+    status: "success",
+    message: "Welcome! I hope you're Authorized to be here!!!",
+  })
+})
 
 // Catch 404 and forward to error handler
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
@@ -78,3 +77,6 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
   err.statusCode = 404
   next(err)
 })
+
+// error handler middleware
+app.use(errorMiddleware)
