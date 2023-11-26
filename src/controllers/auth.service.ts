@@ -233,7 +233,9 @@ export const resendVerificationEmail = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body
 
-      const isRegisteredUser = await redisStore.get(email)
+      const isRegisteredUser = await prisma.user.findUnique({
+        where: {email}
+      })
 
       if (!isRegisteredUser) {
         res.status(404).json({
