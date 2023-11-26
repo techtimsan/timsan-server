@@ -23,13 +23,14 @@ app.use(express.urlencoded({ extended: false }))
 app.disable("x-powered-by")
 
 // cors options
-// app.use(
-//   cors({
-//     origin: "*", // CORS_ORIGIN
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-//     credentials: true,
-//   })
-// )
+app.use(
+  cors({
+    origin: "*", // CORS_ORIGIN
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    credentials: true,
+    optionsSuccessStatus: 204
+  })
+)
 
 // cookies
 app.use(cookieParser())
