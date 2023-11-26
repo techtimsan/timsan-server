@@ -372,7 +372,7 @@ export const refreshAccessToken = asyncErrorMiddleware(
       const errorMessage = `Could not Refresh Token`
       if (!decoded) return next(new ErrorHandler(errorMessage, 400))
 
-      const session = await redisStore.get(decoded.id)
+      const session = await redisStore.get(decoded.userId)
 
       if (!session) return next(new ErrorHandler(errorMessage, 400))
 
