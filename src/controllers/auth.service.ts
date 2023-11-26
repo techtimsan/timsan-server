@@ -94,7 +94,8 @@ export const registerUser = asyncErrorMiddleware(
           const redisUserData = await redisStore.set(
             userId,
             JSON.stringify({
-              userId,
+              // userId,
+              id: userId,
               firstName,
               lastName,
               email,

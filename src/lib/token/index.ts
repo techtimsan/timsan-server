@@ -27,7 +27,7 @@ export const signJWTAccessToken = (
 export const verifyAccessOrRefreshToken = (token: string, secret: string) => {
   try {
     const decoded = jwt.verify(token, secret)
-
+    
     return decoded as {
        id: string; name: string; email: string 
     }
