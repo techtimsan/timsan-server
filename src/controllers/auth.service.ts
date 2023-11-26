@@ -94,7 +94,8 @@ export const registerUser = asyncErrorMiddleware(
           const redisUserData = await redisStore.set(
             userId,
             JSON.stringify({
-              userId,
+              // userId,
+              id: userId,
               firstName,
               lastName,
               email,
@@ -372,7 +373,7 @@ export const refreshAccessToken = asyncErrorMiddleware(
       const errorMessage = `Could not Refresh Token`
       if (!decoded) return next(new ErrorHandler(errorMessage, 400))
 
-      const session = await redisStore.get(decoded.userId)
+      const session = await redisStore.get(decoded.id)
 
       if (!session) return next(new ErrorHandler(errorMessage, 400))
 

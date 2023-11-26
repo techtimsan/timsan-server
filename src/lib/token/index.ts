@@ -26,15 +26,11 @@ export const signJWTAccessToken = (
 
 export const verifyAccessOrRefreshToken = (token: string, secret: string) => {
   try {
-    // const decoded = jwt.verify(token, secret)
-    const decoded = jwt.verify(token, secret) as { id: string; name: string; email: string };
-
-    const { id, ...rest } = decoded;
-    return { userId: id, ...rest };
-
-    // return decoded as {
-    //    id: string; name: string; email: string 
-    // }
+    const decoded = jwt.verify(token, secret)
+    
+    return decoded as {
+       id: string; name: string; email: string 
+    }
   } catch (error) {
     console.log("Error verifying jwt : ", error)
     return null

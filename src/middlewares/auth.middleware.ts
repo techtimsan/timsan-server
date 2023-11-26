@@ -19,12 +19,11 @@ export const isAuthenticated = asyncErrorMiddleware(
       
       if (!decoded) return next(new ErrorHandler("Invalid Access Token", 400))
     
-      const userExists = await redisStore.get(decoded.userId)
+      const userExists = await redisStore.get(decoded.id)
       
       if (!userExists) return next(new ErrorHandler("User does not exist", 400))
       
       req.user = JSON.parse(userExists)
-      
       next()
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))
