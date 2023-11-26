@@ -42,4 +42,5 @@ export {
 export {
   getAllRedisData,
   getRedisDataById,
+  deleteRedisUserDataById
 } from "./redis.service"

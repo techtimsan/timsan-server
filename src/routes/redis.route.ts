@@ -1,6 +1,6 @@
 import { NextFunction, Response, Router, Request } from "express"
 import { validateRequestBody } from "zod-express-middleware"
-import {   getAllRedisData, getRedisDataById, } from "../controllers"
+import {   deleteRedisUserDataById, getAllRedisData, getRedisDataById, } from "../controllers"
 
 
 export const redisRoute = Router({
@@ -15,5 +15,6 @@ const tester = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 redisRoute.get("/", getAllRedisData)
-redisRoute.get("/:id", getRedisDataById)
+redisRoute.get("/:userId", getRedisDataById)
+redisRoute.delete("/:userId", deleteRedisUserDataById)
 
