@@ -52,7 +52,7 @@ export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Res
     try {
         const userId = req.user?.id as string
         console.log("the user is", req.user, "the id is", req.user?.id)
-        const {
+        const { 
             title, 
             desc,
             author, 

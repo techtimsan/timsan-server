@@ -19,7 +19,7 @@ import {
   generateEmailConfirmationToken,
   refreshTokenOptions,
   sendAccessAndRefreshToken,
-  signJWTAccessToken,
+    signJWTAccessToken,
   verifyAccessOrRefreshToken,
   verifyEmailConfirmationToken,
 } from "../lib/token"
@@ -94,7 +94,7 @@ export const registerUser = asyncErrorMiddleware(
           const redisUserData = await redisStore.set(
             userId,
             JSON.stringify({
-              // userId,
+              userId,
               id: userId,
               firstName,
               lastName,
