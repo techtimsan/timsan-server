@@ -38,3 +38,8 @@ export {
   // testingCloudUpload,
 
 } from "./newsAndBroadcast.service"
+
+export {
+  getAllRedisData,
+  getRedisDataById,
+} from "./redis.service"
