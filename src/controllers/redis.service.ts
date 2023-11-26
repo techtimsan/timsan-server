@@ -46,3 +46,17 @@ export const getRedisDataById = asyncErrorMiddleware(
     }
   }
 )
+
+export const deleteRedisUserDataById = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params
+
+    const deletedData = await redisStore.del(userId)
+
+    res.status(200).json({
+      message: "Deleted Redis data successfully!",
+    })
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 400))
+  }
+})
