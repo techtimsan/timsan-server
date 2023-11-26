@@ -92,6 +92,8 @@ export const verifyEmailConfirmationToken = (confirmationToken: string) => {
   try {
     const decoded = jwt.verify(confirmationToken, jwt_secret)
 
+    console.log("decoded jwt data : ", decoded)
+
     return decoded as {
       firstName: string
       email: string

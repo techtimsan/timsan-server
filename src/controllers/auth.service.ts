@@ -64,6 +64,7 @@ export const registerUser = asyncErrorMiddleware(
               password: hashedPassword,
             },
             select: {
+              id: true,
               firstName: true,
               lastName: true,
               email: true,
@@ -72,6 +73,7 @@ export const registerUser = asyncErrorMiddleware(
           })
 
           const {
+            id: userId,
             firstName: firstname,
             lastName: lastname,
             email: emailAddress,
@@ -91,7 +93,7 @@ export const registerUser = asyncErrorMiddleware(
 
           // save new user to redis
           const redisUserData = await redisStore.set(
-            email,
+            userId,
             JSON.stringify({
               firstName,
               lastName,
@@ -104,7 +106,7 @@ export const registerUser = asyncErrorMiddleware(
 
           const templateData = {
             firstName,
-            emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${email}/${confirmationToken}`,
+            emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${userId}/${confirmationToken}`,
           }
 
           // send activation email
@@ -142,12 +144,12 @@ export const registerUser = asyncErrorMiddleware(
 export const verifyEmail = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, confirmationToken } = req.params
+      const { userId, confirmationToken } = req.params
 
       // check if email is in redis server
-      const emailExists = await redisStore.get(email)
+      const userExists = await redisStore.get(userId)
 
-      if (!emailExists) {
+      if (!userExists) {
         const errorMessage = "Email does not exist"
         res.redirect(
           `${BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`
@@ -155,7 +157,7 @@ export const verifyEmail = asyncErrorMiddleware(
       }
 
       // check if token is not expired
-      const userData = JSON.parse(JSON.stringify(emailExists))
+      const userData = JSON.parse(JSON.stringify(userExists))
 
       const expired = Date.now() > userData.expiresAt
       console.log(userData.expiresAt)
@@ -181,7 +183,7 @@ export const verifyEmail = asyncErrorMiddleware(
       if (verifiedToken && !verifiedToken.emailVerified) {
         const verifiedUser = await prisma.user.update({
           where: {
-            email,
+            id: userId,
           },
           data: {
             emailVerified: true,
@@ -189,7 +191,7 @@ export const verifyEmail = asyncErrorMiddleware(
         })
 
         // update redis data
-        const updatedRedisUserData = await redisStore.hset(email, "emailVerified", "true")
+        const updatedRedisUserData = await redisStore.hset(userId, "emailVerified", "true")
 
         const successMessage = "Email Verified Successfully"
 
@@ -203,9 +205,7 @@ export const verifyEmail = asyncErrorMiddleware(
         )
       }
     } catch (error: any) {
-      return res.status(500).json({
-        error: error.message,
-      })
+      return next(new ErrorHandler(error.message, 400))
     }
   }
 )

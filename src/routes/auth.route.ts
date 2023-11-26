@@ -24,7 +24,7 @@ authRoute.post(
   registerUser
 )
 authRoute.get("/verified", emailVerified)
-authRoute.get("/verify-email/:email/:confirmationToken", verifyEmail)
+authRoute.get("/verify-email/:userId/:confirmationToken", verifyEmail)
 authRoute.post("/login", validateData(LoginUserSchema), loginUser)
 // authRoute.get("/verify-email/:accessToken")
 authRoute.get("/logout", isAuthenticated, logoutUser)
