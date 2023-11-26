@@ -2,8 +2,8 @@ import express, { Express, Request, Response, NextFunction } from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE } from "./lib/constants"
-import { authRoute, conferenceRoute, newsRoute } from "./routes"
+import { AUTH_ROUTE, CONFERENCE_ROUTE, NEWS_ROUTE, REDIS_ROUTE } from "./lib/constants"
+import { authRoute, conferenceRoute, newsRoute, redisRoute } from "./routes"
 import path from "path"
 import { ErrorHandler } from "./utils"
 import { errorMiddleware } from "./middlewares"
@@ -66,6 +66,7 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
 app.use(AUTH_ROUTE, authRoute)
 app.use(CONFERENCE_ROUTE, conferenceRoute)
 app.use(NEWS_ROUTE, newsRoute)
+app.use(REDIS_ROUTE, redisRoute)
 // app.use(BROADCAST_ROUTE, broadcastRoute)
 
 // Catch 404 and forward to error handler

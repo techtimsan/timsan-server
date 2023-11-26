@@ -14,6 +14,7 @@ export const AUTH_ROUTE = `${BASE_API_URL}/user`
 export const CONFERENCE_ROUTE = `${BASE_API_URL}/conference`
 export const NEWS_ROUTE = `${BASE_API_URL}/news`
 export const BROADCAST_ROUTE = `${BASE_API_URL}/broadcast`
+export const REDIS_ROUTE = `${BASE_API_URL}/redis`
 
 export const access_token = process.env.ACCESS_TOKEN as string
 export const access_token_expire = parseInt(
