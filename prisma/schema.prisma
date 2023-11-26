@@ -326,7 +326,7 @@ enum GraduationStatus {
   POST_GRADUATE
 }
 
-enum Zone {
+enum Zone {m
   SOUTH_WEST
   NORTH_WEST
   NORTH_CENTRAL

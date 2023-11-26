@@ -15,15 +15,18 @@ export const isAuthenticated = asyncErrorMiddleware(
           message: "Login to Access Resource. ",
         })
 
+        console.log("point 1", accessToken)
       const decoded = verifyAccessOrRefreshToken(accessToken, access_token)
-
+      console.log("point 2", decoded)
       if (!decoded) return next(new ErrorHandler("Invalid Access Token", 400))
-
-      const user = await redisStore.get(decoded.user.id)
-
-      if (!user) return next(new ErrorHandler("User does not exist", 400))
-
-      req.user = JSON.parse(user)
+      const userIid = decoded.id
+      console.log("point 3", userIid)
+      
+      const userExists = await redisStore.get(decoded.id)
+      
+      if (!userExists) return next(new ErrorHandler("User does not exist", 400))
+      
+      req.user = JSON.parse(userExists)
       next()
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))

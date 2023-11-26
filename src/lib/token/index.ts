@@ -29,7 +29,7 @@ export const verifyAccessOrRefreshToken = (token: string, secret: string) => {
     const decoded = jwt.verify(token, secret)
 
     return decoded as {
-      user: { id: string; name: string; email: string }
+       id: string; name: string; email: string 
     }
   } catch (error) {
     console.log("Error verifying jwt : ", error)

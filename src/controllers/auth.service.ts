@@ -79,7 +79,6 @@ export const registerUser = asyncErrorMiddleware(
             email: emailAddress,
             emailVerified,
           } = user
-
           // expires in 3 days
           const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000
 
@@ -372,7 +371,7 @@ export const refreshAccessToken = asyncErrorMiddleware(
       const errorMessage = `Could not Refresh Token`
       if (!decoded) return next(new ErrorHandler(errorMessage, 400))
 
-      const session = await redisStore.get(decoded.user.id)
+      const session = await redisStore.get(decoded.id)
 
       if (!session) return next(new ErrorHandler(errorMessage, 400))
 
