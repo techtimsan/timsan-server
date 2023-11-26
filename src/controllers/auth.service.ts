@@ -146,6 +146,8 @@ export const verifyEmail = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, confirmationToken } = req.params
+      console.log("userId is",userId)
+      console.log("confirmation token is", confirmationToken)
 
       // check if email is in redis server
       const userExists = await redisStore.get(userId)
@@ -193,6 +195,7 @@ export const verifyEmail = asyncErrorMiddleware(
 
         // update redis data
         const updatedRedisUserData = await redisStore.hset(userId, "emailVerified", "true")
+        console.log("redis is",updatedRedisUserData)
 
         const successMessage = "Email Verified Successfully"
 
