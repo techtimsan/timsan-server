@@ -79,6 +79,7 @@ export const sendAccessAndRefreshToken = (
     success: true,
     user,
     accessToken,
+    message: "Logged in Successfully..."
   })
 }
 
