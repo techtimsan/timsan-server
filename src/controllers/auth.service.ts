@@ -443,6 +443,15 @@ export const getUserById = asyncErrorMiddleware(
         where: {
           id: userId,
         },
+        select: {
+          firstName: true,
+          lastName: true,
+          conferences: true,
+          email: true,
+          emailVerified: true,
+          password: true,
+        }
+        
       })
 
       if (!user) {
