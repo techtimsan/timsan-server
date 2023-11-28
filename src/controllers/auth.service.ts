@@ -183,7 +183,7 @@ export const verifyEmail = asyncErrorMiddleware(
 
       // const { emailVerified } = verifiedToken
 
-      if (verifiedToken && !verifiedToken.emailVerified) {
+      if (verifiedToken && verifiedToken.emailVerified !== true) {
         const verifiedUser = await prisma.user.update({
           where: {
             id: userId,
@@ -200,12 +200,12 @@ export const verifyEmail = asyncErrorMiddleware(
         const successMessage = "Email Verified Successfully"
 
         res.redirect(
-          `/api/v1/user/verified?error=false&message=${successMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified?error=false&message=${successMessage}`
         )
       } else {
         const verifiedMessage = "Email Already Verified"
         res.redirect(
-          `/api/v1/user/verified?error=true&message=${verifiedMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${verifiedMessage}`
         )
       }
     } catch (error: any) {
