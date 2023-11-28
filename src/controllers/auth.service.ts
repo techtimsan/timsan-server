@@ -265,7 +265,7 @@ export const resendVerificationEmail = asyncErrorMiddleware(
 
       const templateData = {
         firstName,
-        emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/confirm-email/${confirmationToken}`,
+        emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${confirmationToken}`,
       }
 
       // resend email
