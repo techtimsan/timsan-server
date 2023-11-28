@@ -146,12 +146,10 @@ export const verifyEmail = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, confirmationToken } = req.params
-      console.log("userId is",userId)
-      console.log("confirmation token is", confirmationToken)
 
       // check if email is in redis server
       const userExists = await redisStore.get(userId)
-
+      
       if (!userExists) {
         const errorMessage = "Email does not exist"
         res.redirect(
@@ -160,15 +158,14 @@ export const verifyEmail = asyncErrorMiddleware(
       }
 
       // check if token is not expired
-      const userData = JSON.parse(JSON.stringify(userExists))
+      const userData = JSON.parse(userExists as string)
 
-      const expired = Date.now() > userData.expiresAt
-      console.log(userData.expiresAt)
+      const expired = Date.now() >= userData.expiresAt
 
       if (expired) {
         const errorMessage = "Confirmation Token already expired"
         res.redirect(
-          `/api/v1/user/verified?error=true&message=${errorMessage}`
+          `${BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`
         )
       }
 
@@ -181,9 +178,7 @@ export const verifyEmail = asyncErrorMiddleware(
         )
       }
 
-      // const { emailVerified } = verifiedToken
-
-      if (verifiedToken && verifiedToken.emailVerified !== true) {
+      if (verifiedToken && userData.emailVerified !== true) {
         const verifiedUser = await prisma.user.update({
           where: {
             id: userId,
@@ -193,9 +188,12 @@ export const verifyEmail = asyncErrorMiddleware(
           },
         })
 
+        console.log("verified user : ", verifiedUser)
+
         // update redis data
-        const updatedRedisUserData = await redisStore.hset(userId, "emailVerified", "true")
-        console.log("redis is",updatedRedisUserData)
+        userData.emailVerified = verifiedUser.emailVerified
+        const verifiedUserData = JSON.stringify(userData)
+        const updatedRedisUserData = await redisStore.set(userId, verifiedUserData)
 
         const successMessage = "Email Verified Successfully"
 
