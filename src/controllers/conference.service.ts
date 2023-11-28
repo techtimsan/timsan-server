@@ -111,7 +111,14 @@ export const registerForConference = asyncErrorMiddleware(
         },
       })
 
-      const conferenceMailData = { shortName: "ITAC", firstName: "Ridwan" }
+      const attendeeDetails = await prisma.user.findFirst({
+        where: {
+          id: attendeeId
+        }
+      })
+      const name = attendeeDetails?.firstName
+
+      const conferenceMailData = { shortName: "ITAC", firstName: name }
 
       try {
         await sendEmail({
