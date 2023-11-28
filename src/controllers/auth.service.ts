@@ -476,6 +476,9 @@ export const deleteUserById = asyncErrorMiddleware(
         },
       })
 
+      // delete user redis data
+      await redisStore.del(userId)
+
       res.status(200).json({
         message: "Deleted User Successfully!",
       })
