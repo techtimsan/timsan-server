@@ -245,10 +245,10 @@ export const resendVerificationEmail = asyncErrorMiddleware(
         })
       }
 
-      const { firstName, lastName, emailVerified } = JSON.parse(
+      const { id: userId, firstName, lastName, emailVerified } = JSON.parse(
         JSON.stringify(isRegisteredUser)
       )
-
+      
       if (emailVerified)
         res.status(400).json({
           success: false,
@@ -265,7 +265,7 @@ export const resendVerificationEmail = asyncErrorMiddleware(
 
       const templateData = {
         firstName,
-        emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${confirmationToken}`,
+        emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${userId}/${confirmationToken}`,
       }
 
       // resend email
