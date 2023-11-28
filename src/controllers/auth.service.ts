@@ -19,7 +19,7 @@ import {
   generateEmailConfirmationToken,
   refreshTokenOptions,
   sendAccessAndRefreshToken,
-  signJWTAccessToken,
+    signJWTAccessToken,
   verifyAccessOrRefreshToken,
   verifyEmailConfirmationToken,
 } from "../lib/token"
@@ -94,7 +94,7 @@ export const registerUser = asyncErrorMiddleware(
           const redisUserData = await redisStore.set(
             userId,
             JSON.stringify({
-              // userId,
+              userId,
               id: userId,
               firstName,
               lastName,
@@ -146,6 +146,8 @@ export const verifyEmail = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, confirmationToken } = req.params
+      console.log("userId is",userId)
+      console.log("confirmation token is", confirmationToken)
 
       // check if email is in redis server
       const userExists = await redisStore.get(userId)
@@ -193,6 +195,7 @@ export const verifyEmail = asyncErrorMiddleware(
 
         // update redis data
         const updatedRedisUserData = await redisStore.hset(userId, "emailVerified", "true")
+        console.log("redis is",updatedRedisUserData)
 
         const successMessage = "Email Verified Successfully"
 
@@ -233,7 +236,9 @@ export const resendVerificationEmail = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body
 
-      const isRegisteredUser = await redisStore.get(email)
+      const isRegisteredUser = await prisma.user.findUnique({
+        where: {email}
+      })
 
       if (!isRegisteredUser) {
         res.status(404).json({
