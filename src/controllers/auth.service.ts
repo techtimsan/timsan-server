@@ -316,7 +316,7 @@ export const loginUser = asyncErrorMiddleware(
         return res
           .status(401)
           .json({
-            message: "Verify your email! ⚠",
+            message: "Check your mail to verify your email address ⚠",
           })
           .redirect("/user/login")
       }
