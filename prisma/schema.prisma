@@ -31,6 +31,8 @@ model User {
   posts              Post[]               @relation("posts")
   likedPosts         Post[]               @relation("likedPosts")
   stateProfile       StateProfile[]
+  zoneProfile ZoneProfile[]
+  necProfile NecProfile[]
 }
 
 model MemberProfile {
@@ -83,6 +85,11 @@ model InstitutionProfile {
   patrons         PatronProfile[]
 }
 
+enum ExcoStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model ExcoProfile {
   id               String             @id @default(cuid())
   firstName        String
@@ -102,6 +109,7 @@ model ExcoProfile {
   institutionId    String
   stateProfileId   String
   zoneProfileId    String
+  status ExcoStatus // still in
   necProfileId     String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
@@ -207,6 +215,8 @@ model ZoneProfile {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   activities  Activity[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
   events      Event[]
   excos       ExcoProfile[]
   patrons     PatronProfile[]
@@ -225,6 +235,8 @@ model NecProfile {
   events      Event[]
   excos       ExcoProfile[]
   patrons     PatronProfile[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
 }
 
 model MailingList {
@@ -506,5 +518,16 @@ name String
 email String
 age Int?
    createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Newsletter {
+  id String @id @default(cuid())
+  email String @unique
+
+  userId String
+  // user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
