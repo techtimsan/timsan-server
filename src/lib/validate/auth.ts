@@ -74,6 +74,11 @@ export const RegisterForConferenceSchema = z.object({
   paymentStatus: z.enum(["PAYMENT_SUCCESSFUL", "PAYMENT_PENDING"]),
 })
 
+export const ResetPasswordSchema = z.object({
+  oldPassword: z.string().min(6),
+  newPassword: z.string().min(6)
+})
+
 export const validateData =
   (schema: Schema) =>
   async (req: Request, res: Response, next: NextFunction) => {

@@ -8,6 +8,7 @@ export {
   logoutUser,
   refreshAccessToken,
   resendVerificationEmail,
+  resetPassword,
   emailVerified
 } from "./auth.service"
 export {
