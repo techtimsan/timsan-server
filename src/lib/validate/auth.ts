@@ -74,23 +74,6 @@ export const RegisterForConferenceSchema = z.object({
   paymentStatus: z.enum(["PAYMENT_SUCCESSFUL", "PAYMENT_PENDING"]),
 })
 
-export const CreateZoneProfileSchema = z.object({
-  zone: z.enum(["SOUTH_WEST", "NORTH_WEST", "NORTH_CENTRAL", "NORTH_EAST"]),
-  address: z.string().min(5),
-  email: z.string().email(),
-  phone: z.string().min(10),
-  avatarUrl: z.string()
-})
-
-export const CreateStateProfileSchema = z.object({
-  zone: z.enum(["SOUTH_WEST", "NORTH_WEST", "NORTH_CENTRAL", "NORTH_EAST"]),
-  address: z.string().min(5),
-  email: z.string().email(),
-  phone: z.string().min(10),
-  avatarUrl: z.string()
-})
-
-
 export const validateData =
   (schema: Schema) =>
   async (req: Request, res: Response, next: NextFunction) => {
