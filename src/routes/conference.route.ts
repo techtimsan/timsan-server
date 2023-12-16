@@ -7,7 +7,7 @@ import {
   getAllConferenceAttendee,
   registerForConference,
 } from "../controllers"
-import { CreateNewConferenceSchema, RegisterForConferenceSchema, validateData } from "../lib/validate/auth"
+import { CreateNewConferenceSchema, CreateZoneProfileSchema, validateData } from "../lib/validate/auth"
 
 export const conferenceRoute = Router({
   caseSensitive: true,
@@ -19,7 +19,7 @@ conferenceRoute.get("/", getAllConference)
 /**
  * Register for Conference
  */
-conferenceRoute.post("/register/:conferenceId", validateData(RegisterForConferenceSchema), registerForConference)
+conferenceRoute.post("/register/:conferenceId", validateData(CreateZoneProfileSchema), registerForConference)
 /**
  * Get all Registered Attendees
  */

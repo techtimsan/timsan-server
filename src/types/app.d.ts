@@ -117,6 +117,14 @@ export type zoneProfileData = {
   avatarUrl?: string
 }
 
+export type NecProfileData = {
+  address: string
+  email: string
+  phoneNumber: string
+  avatarUrl?: string
+}
+
+
 export type ConferenceData = {
   title: string
   desc: string

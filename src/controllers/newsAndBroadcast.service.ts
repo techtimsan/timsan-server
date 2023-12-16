@@ -51,7 +51,7 @@ export const getAllNewsPosts = asyncErrorMiddleware(async (req: Request, res: Re
 export const createNewsPost = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.id as string
-        console.log("the user is", req.user, "the id is", req.user?.id)
+        // console.log("the user is", req.user, "the id is", req.user?.id)
         const { 
             title, 
             desc,
