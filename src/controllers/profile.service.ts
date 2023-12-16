@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { asyncErrorMiddleware } from "../middlewares"
-import { FileUploadFormat, InstitutionProfileData, MemberProfileData, StateProfileData } from "../types/app"
+import { FileUploadFormat, InstitutionProfileData, MemberProfileData, NecProfileData, StateProfileData, zoneProfileData } from "../types/app"
 import { prisma } from "../lib/db"
 import { uploadToCloudinary } from "../lib/upload"
 import { ErrorHandler } from "../utils"
@@ -365,7 +365,7 @@ export const createStateProfile = asyncErrorMiddleware(
       });
   
       if (stateExists) {
-        return next(new ErrorHandler('State Profile Already Exists', 404));
+        return next(new ErrorHandler('Szone:  "SOUTH_WEST", "NORTH_WEST", "NORTH_CENTRAL", "NORTH_EAST"tate Profile Already Exists', 404));
       }
       
       const newStateProfile = await prisma.stateProfile.create({
@@ -497,7 +497,47 @@ export const getStateProfile = asyncErrorMiddleware(
 export const createZoneProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.user?.id as string
+      const email = req.user?.email as string
+      const {
+        address,
+        zone,
+        phoneNumber,
+      }: zoneProfileData = req.body
+
+      let avatarUrl = ''
+      if (req.file) {
+          const file: FileUploadFormat = req.file;
+          avatarUrl = await uploadToCloudinary(file, 'zone-profile', userId);
+      }
+
+      const zoneExists = await prisma.zoneProfile.findFirst({
+        where: { zone },
+      });
+  
+      if (zoneExists) {
+        return next(new ErrorHandler('Zone Profile Already Exists', 404));
+      }
       
+      const newZoneProfile = await prisma.zoneProfile.create({
+        data:{
+          address,
+          zone,
+          email,
+          phoneNumber,
+          avatarUrl,
+          userId
+        }
+      })
+      if (newZoneProfile) {
+        res.status(200).json({
+            success: true,
+            message: 'Zone Profile created successfully',
+            data: newZoneProfile
+          });
+      } else {
+          return next(new ErrorHandler('Something went wrong creating profile', 500));
+      }
     } catch (error: any) {
       return next(new ErrorHandler('Internal Server Error', 500));
   }
@@ -507,7 +547,61 @@ export const createZoneProfile = asyncErrorMiddleware(
 export const editZoneProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.user?.id as string
+      const email = req.user?.email as string
+
+      const existingProfile = await prisma.zoneProfile.findFirst({
+        where: { userId, email },
+      });
+
+      if (!existingProfile) {
+        return next(new ErrorHandler('Zone Profile not found', 404));
+      }
+      const {
+        address,
+        zone: newZone,
+        phoneNumber,
+      }: zoneProfileData = req.body
+
+      const existingZone = await prisma.zoneProfile.findFirst({
+        where: { zone: newZone },
+        select: { zone: true },
+      });
       
+      const allZones = await prisma.zoneProfile.findMany({
+        select: { zone: true },
+      });
+      
+      const existingZoneNames = allZones.map((zn) => zn.zone);
+      
+      if (existingZone || existingZoneNames.includes(newZone)) {
+        return next(new ErrorHandler('Zone name already exists', 400));
+      }
+      
+      let avatarUrl = existingProfile.avatarUrl;
+      if (req.file) {
+        const file: FileUploadFormat = req.file;
+        avatarUrl = await uploadToCloudinary(file, 'zone-profile', userId);
+      }
+      
+      const updatedZoneProfile = await prisma.zoneProfile.update({
+        where: { email, userId },
+        data: {
+          address,
+          zone: newZone,
+          email,
+          phoneNumber,
+          avatarUrl,
+          userId
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Zone Profile updated successfully',
+        data: updatedZoneProfile,
+      });
+
     } catch (error: any) {
       return next(new ErrorHandler('Internal Server Error', 500));
   }
@@ -517,7 +611,20 @@ export const editZoneProfile = asyncErrorMiddleware(
 export const getZoneProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      
+      const userId = req.user?.id as string
+      const zoneProfile = await prisma.zoneProfile.findFirst({
+        where: { userId },
+      });
+  
+      if (!zoneProfile) {
+        return next(new ErrorHandler('Zone Profile not found', 404));
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: 'Zone Profile retrieved successfully',
+        data: zoneProfile,
+      })
     } catch (error: any) {
       return next(new ErrorHandler('Internal Server Error', 500));
   }
@@ -531,7 +638,45 @@ export const getZoneProfile = asyncErrorMiddleware(
 export const createNECProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.user?.id as string
+      const email = req.user?.email as string
+      const {
+        address,
+        phoneNumber,
+      }: NecProfileData = req.body
+
+      let avatarUrl = ''
+      if (req.file) {
+          const file: FileUploadFormat = req.file;
+          avatarUrl = await uploadToCloudinary(file, 'nec-profile', userId);
+      }
+
+      const necExists = await prisma.necProfile.findFirst({
+        where: { email },
+      });
+  
+      if (necExists) {
+        return next(new ErrorHandler('NEC Profile Already Exists', 404));
+      }
       
+      const newNecProfile = await prisma.necProfile.create({
+        data:{
+          address,
+          email,
+          phoneNumber,
+          avatarUrl,
+          userId
+        }
+      })
+      if (newNecProfile) {
+        res.status(200).json({
+            success: true,
+            message: 'NEC Profile created successfully',
+            data: newNecProfile
+          });
+      } else {
+          return next(new ErrorHandler('Something went wrong creating profile', 500));
+      }
     } catch (error: any) {
       return next(new ErrorHandler('Internal Server Error', 500));
   }
@@ -541,7 +686,44 @@ export const createNECProfile = asyncErrorMiddleware(
 export const editNECProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.user?.id as string
+      const email = req.user?.email as string
+
+      const existingProfile = await prisma.necProfile.findFirst({
+        where: { userId, email },
+      });
+
+      if (!existingProfile) {
+        return next(new ErrorHandler('NEC Profile not found', 404));
+      }
+      const {
+        address,
+        phoneNumber,
+      }: NecProfileData = req.body
+
       
+      let avatarUrl = existingProfile.avatarUrl;
+      if (req.file) {
+        const file: FileUploadFormat = req.file;
+        avatarUrl = await uploadToCloudinary(file, 'nec-profile', userId);
+      }
+      
+      const updatedNecProfile = await prisma.necProfile.update({
+        where: { email, userId },
+        data: {
+          address,
+          email,
+          phoneNumber,
+          avatarUrl,
+          userId
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'NEC Profile updated successfully',
+        data: updatedNecProfile,
+      });
     } catch (error: any) {
       return next(new ErrorHandler('Internal Server Error', 500));
   }
@@ -551,7 +733,20 @@ export const editNECProfile = asyncErrorMiddleware(
 export const getNECProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      
+      const userId = req.user?.id as string
+      const necProfile = await prisma.necProfile.findFirst({
+        where: { userId },
+      });
+  
+      if (!necProfile) {
+        return next(new ErrorHandler('NEC Profile not found', 404));
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: 'NEC Profile retrieved successfully',
+        data: necProfile,
+      })
     } catch (error: any) {
       return next(new ErrorHandler('Internal Server Error', 500));
   }

@@ -44,3 +44,38 @@ export {
   getRedisDataById,
   deleteRedisUserDataById
 } from "./redis.service"
+
+
+export{
+// nec
+
+createNECProfile,
+editNECProfile,
+getNECProfile,
+
+// zone
+
+createZoneProfile,
+editZoneProfile,
+getZoneProfile,
+
+
+// state
+
+createStateProfile,
+editStateProfile,
+getStateProfile,
+
+// institution
+
+createInstitutionProfile,
+editInstitutionProfile,
+getInstitutionProfile,
+
+// member
+
+createMemberProfile,
+editMemberProfile,
+getMemberProfile
+
+} from "./profile.service"
