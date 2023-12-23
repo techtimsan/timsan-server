@@ -21,3 +21,5 @@ broadcastRoute.get("/:broadcastId", getBroadcastById)
 broadcastRoute.post("/createBroadcast", uploadImage, validateData(CreateBroadCastSchema),  createBroadcast)
 broadcastRoute.patch("/editBroadcast/:broadcastId", uploadImage, validateData(CreateBroadCastSchema), editBroadcast)
 broadcastRoute.delete("/:broadcastId", deleteBroadcast)
+// test commit update
+broadcastRoute.put("/test")
