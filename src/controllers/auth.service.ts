@@ -420,6 +420,9 @@ export const getAllUsers = asyncErrorMiddleware(
             },
           },
         },
+        orderBy: {
+          lastName: "asc"
+        }
       })
 
       res.status(200).json({

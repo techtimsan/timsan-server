@@ -24,6 +24,11 @@ export const formatZodError = (error: ZodError) => {
   return null
 }
 
+export const ResetPasswordSchema = z.object({
+  oldPassword: z.string().min(6),
+  newPassword: z.string().min(6)
+})
+
 export const RegisterUserSchema = z.object({
   accountType: z.enum(["MEMBER", "INSTITUTION", "STATE", "ZONAL", "NEC"]),
   firstName: z.string().min(3),
@@ -72,6 +77,10 @@ export const RegisterForConferenceSchema = z.object({
   attendeeId: z.string(),
   membershipType: z.enum(["TIMSANITE", "IOTB", "OTHERS"]),
   paymentStatus: z.enum(["PAYMENT_SUCCESSFUL", "PAYMENT_PENDING"]),
+})
+
+export const CreateZoneProfileSchema = z.object({
+  
 })
 
 export const validateData =
