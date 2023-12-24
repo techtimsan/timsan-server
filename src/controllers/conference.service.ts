@@ -149,7 +149,20 @@ export const registerForConference = asyncErrorMiddleware(
 export const getAllConferenceAttendee = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const attendees = await prisma.conferenceAttendee.findMany()
+      const attendees = await prisma.conferenceAttendee.findMany({
+        select: {
+          attendee: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            }
+          },
+          paymentStatus: true,
+          membershipType: true
+        }
+      })
 
       res.status(200).json({
         message: "Fetched Conference Attendees Successfully! 😇 ",
