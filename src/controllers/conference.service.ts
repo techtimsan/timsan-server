@@ -161,6 +161,11 @@ export const getAllConferenceAttendee = asyncErrorMiddleware(
           },
           paymentStatus: true,
           membershipType: true
+        },
+        orderBy: {
+          attendee: {
+            firstName: "asc"
+          }
         }
       })
 
