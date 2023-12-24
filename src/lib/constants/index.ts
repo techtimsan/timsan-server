@@ -5,7 +5,7 @@ export const envConfig = dotenv
 
 export const CORS_ORIGIN = process.env.CORS_ORIGIN as string
 
-export const PORT = Number(process.env.PORT || 3000)
+export const PORT = Number(process.env.PORT || 3001)
 
 export const BASE_SERVER_URL = process.env.NODE_ENV === "production" ? process.env.BASE_SERVER_URL_PROD as string : process.env.BASE_SERVER_URL_DEV as string
 export const BASE_API_URL = `/api/v1`
@@ -40,6 +40,7 @@ export const SMTP_SERVICE = process.env.SMTP_SERVICE as string
 export const SMTP_PASSWORD = process.env.SMTP_PASSWORD as string
 
 export const EXTERNAL_REDIS_URL = process.env.EXTERNAL_REDIS_URL as string
+// export const EXTERNAL_DATABASE_URL = process.env.EXTERNAL_DATABASE_URL as string
 // export const INTERNAL_REDIS_URL = process.env.INTERNAL_REDIS_URL as string
 
 

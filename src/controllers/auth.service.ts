@@ -414,6 +414,7 @@ export const getAllUsers = asyncErrorMiddleware(
           firstName: true,
           lastName: true,
           email: true,
+          emailVerified: true,
           conferences: {
             select: {
               id: true,
