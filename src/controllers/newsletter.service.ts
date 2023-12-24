@@ -6,7 +6,7 @@ import { prisma } from "../lib/db"
 export const subscribeToNewsletter = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email }: { email: string } = req.body
+      // const { email }: { email: string } = req.body
 
         // const alreadySubscribed = await prisma
 

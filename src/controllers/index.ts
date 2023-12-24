@@ -47,36 +47,36 @@ export {
 } from "./redis.service"
 
 
-export{
-// nec
+// export{
+// // nec
 
-createNECProfile,
-editNECProfile,
-getNECProfile,
+// createNECProfile,
+// editNECProfile,
+// getNECProfile,
 
-// zone
+// // zone
 
-createZoneProfile,
-editZoneProfile,
-getZoneProfile,
+// createZoneProfile,
+// editZoneProfile,
+// getZoneProfile,
 
 
-// state
+// // state
 
-createStateProfile,
-editStateProfile,
-getStateProfile,
+// createStateProfile,
+// editStateProfile,
+// getStateProfile,
 
-// institution
+// // institution
 
-createInstitutionProfile,
-editInstitutionProfile,
-getInstitutionProfile,
+// createInstitutionProfile,
+// editInstitutionProfile,
+// getInstitutionProfile,
 
-// member
+// // member
 
-createMemberProfile,
-editMemberProfile,
-getMemberProfile
+// createMemberProfile,
+// editMemberProfile,
+// getMemberProfile
 
-} from "./profile.service"
+// } from "./profile.service"
