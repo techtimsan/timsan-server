@@ -164,7 +164,7 @@ export const getAllConferenceAttendee = asyncErrorMiddleware(
         },
         orderBy: {
           attendee: {
-            firstName: "asc"
+            lastName: "asc"
           }
         }
       })
