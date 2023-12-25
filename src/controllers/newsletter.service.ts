@@ -8,7 +8,7 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body;
 
-      const alreadySubscribed = await prisma.newsletter.findFirst({
+      const alreadySubscribed = await prisma.newsletter.findUnique({
         where: {
           email,
         },
@@ -35,19 +35,24 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
   }
 );
 
-export const getAllNewsletterSubscribers = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const subscribers = await prisma.newsletter.findMany({
-      select: {
-        email: true
-      }
-    })
+export const getAllNewsletterSubscribers = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const subscribers = await prisma.newsletter.findMany({
+        select: {
+          email: true,
+        },
+        orderBy: {
+          email: "asc",
+        },
+      });
 
-    res.status(200).json({
-      message: "Fetched Newsletter Subscribers Successfully!",
-      data: subscribers
-    })
-  } catch (error: any) {
-    return next(new ErrorHandler(error.message, 400));
+      res.status(200).json({
+        message: "Fetched Newsletter Subscribers Successfully!",
+        data: subscribers,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
-})
+);
