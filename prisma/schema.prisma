@@ -529,3 +529,68 @@ model Newsletter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// model Bookmark {}
+
+enum BookCategory {
+  FAYDAH_BOOKS
+  POETRY
+  SEERAH
+  HADITH
+  FIQH
+  PROJECTS_OR_MAGAZINES
+  ARTICLES
+}
+
+model Book {
+  id String @id @default(cuid())
+  category BookCategory
+  thumbnailUrl String
+  rating Int
+  // bookmarkId
+  title String
+  author String
+  desc String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model CourseVideo {
+//   id String @id @default(cuid())
+//   thumbnailUrl String
+//   // metadata Json
+//   videos CourseVideo
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model TiletCourseResource {
+//   id String @id @default(cuid())
+//   title String
+//   courseId String
+//   course TiletCourseResource[] @relation(fields: [courseId], references: [id])
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+enum TiletCourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model TiletCourse {
+  id String @id @default(cuid())
+  thumbnailUrl String
+  title String
+  date DateTime
+  level TiletCourseLevel
+  rating Int
+  instructor String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
