@@ -8,7 +8,7 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body;
 
-      const alreadySubscribed = await prisma.newsletter.findUnique({
+      const alreadySubscribed = await prisma.newsletter.findFirst({
         where: {
           email,
         },
