@@ -46,6 +46,8 @@ export {
   deleteRedisUserDataById
 } from "./redis.service"
 
+export { subscribeToNewsletter, getAllNewsletterSubscribers } from './newsletter.service'
+
 
 // export{
 // // nec
