@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("EXTERNAL_DATABASE_URL")
 }
 
 model User {
@@ -525,6 +525,14 @@ age Int?
 model Newsletter {
   id String @id @default(cuid())
   email String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscription {
+  id String @id @default(cuid())
+  emailAddress String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

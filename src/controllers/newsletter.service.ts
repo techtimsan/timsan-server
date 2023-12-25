@@ -8,9 +8,9 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body;
 
-      const alreadySubscribed = await prisma.newsletter.findFirst({
+      const alreadySubscribed = await prisma.newsletterSubscription.findFirst({
         where: {
-          email,
+          emailAddress: email,
         },
       });
 
@@ -20,9 +20,9 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
         });
       }
 
-      const newsletterSubscription = await prisma.newsletter.create({
+      const newsletterSubscription = await prisma.newsletterSubscription.create({
         data: {
-          email,
+          emailAddress: email,
         },
       });
 
@@ -38,12 +38,12 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
 export const getAllNewsletterSubscribers = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const subscribers = await prisma.newsletter.findMany({
+      const subscribers = await prisma.newsletterSubscription.findMany({
         select: {
-          email: true,
+          emailAddress: true,
         },
         orderBy: {
-          email: "asc",
+          emailAddress: "asc",
         },
       });
 
