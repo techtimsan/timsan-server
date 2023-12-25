@@ -27,7 +27,7 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
       });
 
       res.status(201).json({
-        message: "Thanks for Subscribing to our Newsletter!",
+        message: "Thanks for Subscribing to our Newsletter!.",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
