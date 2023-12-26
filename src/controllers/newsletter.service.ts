@@ -8,7 +8,7 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body;
 
-      const alreadySubscribed = await prisma.newsletterSubscription.findMany({
+      const alreadySubscribed = await prisma.newsletterSubscription.findFirst({
         where: {
           emailAddress: email,
         },
