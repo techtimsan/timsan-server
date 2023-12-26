@@ -52,7 +52,7 @@ export const getAllNewsletterSubscribers = asyncErrorMiddleware(
 
       res.status(200).json({
         message: "Fetched Newsletter Subscribers Successfully!",
-        data: [],
+        data: subscribers,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
