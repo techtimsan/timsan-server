@@ -41,14 +41,14 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
 export const getAllNewsletterSubscribers = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const subscribers = await prisma.newsletterSubscription.findMany({
-      //   select: {
-      //     emailAddress: true,
-      //   },
-      //   orderBy: {
-      //     emailAddress: "asc",
-      //   },
-      // });
+      const subscribers = await prisma.newsletterSubscription.findMany({
+        select: {
+          emailAddress: true,
+        },
+        orderBy: {
+          emailAddress: "asc",
+        },
+      });
 
       res.status(200).json({
         message: "Fetched Newsletter Subscribers Successfully!",
