@@ -26,9 +26,7 @@ export const addInstitution = asyncErrorMiddleware(
       // });
 
       // if (alreadyExists) {
-      //   return res.status(400).json({
-      //     message: "Institution Already Exists!",
-      //   });
+      //   return next(new ErrorHandler("Institution Already Exists!", 400))
       // }
 
       // const institution = await prisma.institutionProfile.create({

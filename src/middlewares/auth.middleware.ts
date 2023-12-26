@@ -11,9 +11,7 @@ export const isAuthenticated = asyncErrorMiddleware(
       const accessToken = req.cookies!.access_token as string
 
       if (!accessToken)
-        res.status(401).json({
-          message: "Login to Access Resource. ",
-        })
+        return next(new ErrorHandler("Login to Access Resource. ", 400))
       
       const decoded = verifyAccessOrRefreshToken(accessToken, access_token)
       
@@ -24,7 +22,7 @@ export const isAuthenticated = asyncErrorMiddleware(
       if (!userExists) return next(new ErrorHandler("User does not exist", 400))
       
       req.user = JSON.parse(userExists)
-      next()
+      return next()
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400))
     }
@@ -50,14 +48,25 @@ export const authorizeUserRoles = (...roles: string[]) => {
 export const isAdmin = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-    } catch (error: any) {}
+      if (req.user && req.user.isAdmin) {
+        return next()
+      }
+
+      return next(new ErrorHandler("Unauthorized", 401))
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400))
+    }
   }
 )
 
 export const isSuperAdmin = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    
+    if (req.user && req.user.isSuperAdmin) {
+      return next()
+    }
+
+    return next(new ErrorHandler("Be warned - Unauthorized", 401))
   } catch (error: any) {
-    
+    return next(new ErrorHandler(error.message, 400))
   }
 })

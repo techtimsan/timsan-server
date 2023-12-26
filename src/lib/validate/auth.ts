@@ -112,7 +112,7 @@ export const validateData =
         ...req.file,
       })
 
-      next()
+      return next()
     } catch (error: any) {
       // console.log(error)
       return next(new ErrorHandler(formatZodError(error) as string, 400))

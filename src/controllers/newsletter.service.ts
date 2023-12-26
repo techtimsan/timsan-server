@@ -15,9 +15,7 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
       });
 
       if (alreadySubscribed) {
-        return res.status(400).json({
-          message: "Already Subscribed to Newsletter!",
-        });
+        return next(new ErrorHandler("Already Subscribed to Newsletter!", 400));
       }
 
       const newsletterSubscription = await prisma.newsletterSubscription.create(
@@ -30,7 +28,7 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
 
       res.status(201).json({
         message: "Thanks for Subscribing to our Newsletter!.",
-        data: newsletterSubscription
+        data: newsletterSubscription,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

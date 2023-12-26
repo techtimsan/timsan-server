@@ -3,6 +3,7 @@ import { asyncErrorMiddleware } from "../middlewares"
 import { ConferenceData, ConferenceRegisterData } from "../types/app"
 import { prisma } from "../lib/db"
 import { sendEmail } from "../lib/mail"
+import { ErrorHandler } from "../utils"
 
 // admin middleware
 export const createNewConference = asyncErrorMiddleware(
@@ -24,9 +25,7 @@ export const createNewConference = asyncErrorMiddleware(
       })
 
       if (conferenceExists) {
-        return res.status(400).json({
-          message: "Conference Already Exists",
-        })
+        return next(new ErrorHandler("Conference Already Exists", 400))
       }
 
       const conference = await prisma.conference.create({
@@ -44,9 +43,7 @@ export const createNewConference = asyncErrorMiddleware(
         message: "Created Conference Successfully",
       })
     } catch (error: any) {
-      return res.status(400).json({
-        message: error.message,
-      })
+      return next(new ErrorHandler(error.message, 400))
     }
   }
 )
@@ -61,9 +58,7 @@ export const getAllConference = asyncErrorMiddleware(
         data: conferences,
       })
     } catch (error: any) {
-      return res.status(400).json({
-        message: error.message,
-      })
+      return next(new ErrorHandler(error.message, 400))
     }
   }
 )
@@ -86,9 +81,7 @@ export const registerForConference = asyncErrorMiddleware(
       })
 
       if (!conferenceExists)
-        return res.status(404).json({
-          message: "Conference does not Exist!",
-        })
+        return next(new ErrorHandler("Conference does not Exist!", 400))
 
       const alreadyRegistered = await prisma.conferenceAttendee.findFirst({
         where: {
@@ -98,9 +91,7 @@ export const registerForConference = asyncErrorMiddleware(
       })
 
       if (alreadyRegistered)
-        res.status(400).json({
-          message: "Already Registered for this Conference",
-        })
+        return next(new ErrorHandler("Already Registered for this Conference", 400))
 
       const newConferenceRegistration = await prisma.conferenceAttendee.create({
         data: {
@@ -134,14 +125,10 @@ export const registerForConference = asyncErrorMiddleware(
           data: newConferenceRegistration,
         })
       } catch (error: any) {
-        res.status(400).json({
-          error: error.message,
-        })
+        return next(new ErrorHandler(error.message, 400))
       }
     } catch (error: any) {
-      return res.status(400).json({
-        message: error.message,
-      })
+      return next(new ErrorHandler(error.message, 400))
     }
   }
 )
@@ -174,9 +161,7 @@ export const getAllConferenceAttendee = asyncErrorMiddleware(
         data: attendees,
       })
     } catch (error: any) {
-      res.status(400).json({
-        message: error.message,
-      })
+      return next(new ErrorHandler(error.message, 400))
     }
   }
 )
@@ -196,8 +181,6 @@ export const deleteConferenceById = asyncErrorMiddleware(async (req: Request, re
       message: "Deleted Conference Successfully!"
     })
   } catch (error: any) {
-    res.status(400).json({
-      message: error.message
-    })
+    return next(new ErrorHandler(error.message, 400))
   }
 })
