@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("EXTERNAL_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -556,7 +556,7 @@ model Book {
   thumbnailUrl String
   rating Int
   // bookmarkId
-  title String
+  title String // TODO: @unique
   author String
   desc String
 
@@ -597,7 +597,7 @@ model TiletCourse {
   date DateTime
   level TiletCourseLevel
   rating Int
-  instructor String
+  instructor String // TODO: String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

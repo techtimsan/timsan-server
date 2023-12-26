@@ -9,15 +9,15 @@ export {
   refreshAccessToken,
   resendVerificationEmail,
   resetPassword,
-  emailVerified
-} from "./auth.service"
+  emailVerified,
+} from "./auth.service";
 export {
   createNewConference,
   getAllConference,
   getAllConferenceAttendee,
   registerForConference,
   deleteConferenceById,
-} from "./conference.service"
+} from "./conference.service";
 
 export {
   //news
@@ -26,8 +26,7 @@ export {
   deleteNewsPost,
   getNewsPostById,
   getAllNewsPosts,
-  
-  
+
   //broadcasts
   createBroadcast,
   editBroadcast,
@@ -37,18 +36,21 @@ export {
 
   //test
   // testingCloudUpload,
-
-} from "./newsAndBroadcast.service"
+} from "./newsAndBroadcast.service";
 
 export {
   getAllRedisData,
   getRedisDataById,
-  deleteRedisUserDataById
-} from "./redis.service"
+  deleteRedisUserDataById,
+} from "./redis.service";
 
-export { subscribeToNewsletter, getAllNewsletterSubscribers } from './newsletter.service'
-export { getAllInstitutions } from './profile.service'
-
+export {
+  subscribeToNewsletter,
+  getAllNewsletterSubscribers,
+} from "./newsletter.service";
+export { getAllInstitutions } from "./profile.service";
+export { addNewBook, getAllBooks } from "./e-library.service";
+export { addTiletCourse, getAllTiletCourses } from "./tilets.service";
 
 // export{
 // // nec
@@ -62,7 +64,6 @@ export { getAllInstitutions } from './profile.service'
 // createZoneProfile,
 // editZoneProfile,
 // getZoneProfile,
-
 
 // // state
 

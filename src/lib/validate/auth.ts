@@ -83,6 +83,24 @@ export const CreateZoneProfileSchema = z.object({
   
 })
 
+export const AddNewBookELibrarySchema = z.object({
+  category: z.enum(["FAYDAH_BOOKS", "POETRY", "SEERAH", "HADITH", "FIQH", "PROJECTS_OR_MAGAZINES", "ARTICLES"]),
+  thumbnailUrl: z.string(),
+  rating: z.number(),
+  title: z.string(),
+  author: z.string(),
+  desc: z.string()
+})
+
+export const TiletsCourseSchema = z.object({
+  thumbnailUrl: z.string(),
+  title: z.string(),
+  date: z.string(),
+  level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
+  rating: z.number(),
+  instructor: z.string()
+})
+
 export const validateData =
   (schema: Schema) =>
   async (req: Request, res: Response, next: NextFunction) => {
