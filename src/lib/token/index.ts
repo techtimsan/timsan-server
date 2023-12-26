@@ -48,6 +48,7 @@ export const accessTokenOptions: AuthTokenOptions = {
   maxAge: access_token_expire * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: "none",
+  secure: true
 }
 
 export const refreshTokenOptions: AuthTokenOptions = {
@@ -55,6 +56,7 @@ export const refreshTokenOptions: AuthTokenOptions = {
   maxAge: refresh_token_expire * 24 * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: "none",
+  secure: true
 }
 
 // send access token on login
