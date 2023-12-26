@@ -47,6 +47,7 @@ export {
 } from "./redis.service"
 
 export { subscribeToNewsletter, getAllNewsletterSubscribers } from './newsletter.service'
+export { getAllInstitutions } from './profile.service'
 
 
 // export{

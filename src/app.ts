@@ -2,12 +2,13 @@ import express, { Express, Request, Response, NextFunction } from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { AUTH_ROUTE, BROADCAST_ROUTE, CONFERENCE_ROUTE, NEWSLETTER_ROUTE, NEWS_ROUTE, REDIS_ROUTE } from "./lib/constants"
+import { AUTH_ROUTE, BROADCAST_ROUTE, CONFERENCE_ROUTE, NEWSLETTER_ROUTE, NEWS_ROUTE, PROFILE_ROUTE, REDIS_ROUTE } from "./lib/constants"
 import { authRoute, broadcastRoute, conferenceRoute, newsRoute, redisRoute } from "./routes"
 import path from "path"
 import { ErrorHandler } from "./utils"
 import { errorMiddleware } from "./middlewares"
 import { newsletterRoute } from "./routes/newsletter.route"
+import { profileRoute } from "./routes/profile.route"
 
 export const app: Express = express()
 
@@ -62,6 +63,7 @@ app.use(NEWS_ROUTE, newsRoute)
 app.use(REDIS_ROUTE, redisRoute)
 app.use(BROADCAST_ROUTE, broadcastRoute)
 app.use(NEWSLETTER_ROUTE, newsletterRoute)
+app.use(PROFILE_ROUTE, profileRoute)
 
 // healthcheck
 app.get("/", (req: Request, res: Response, next: NextFunction) => {

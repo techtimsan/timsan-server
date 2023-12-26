@@ -47,14 +47,14 @@ export const accessTokenOptions: AuthTokenOptions = {
   expires: new Date(Date.now() + access_token_expire * 60 * 60 * 1000),
   maxAge: access_token_expire * 60 * 60 * 1000,
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: "none",
 }
 
 export const refreshTokenOptions: AuthTokenOptions = {
   expires: new Date(Date.now() + refresh_token_expire * 24 * 60 * 60 * 1000),
   maxAge: refresh_token_expire * 24 * 60 * 60 * 1000,
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: "none",
 }
 
 // send access token on login
