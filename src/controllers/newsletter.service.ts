@@ -8,26 +8,29 @@ export const subscribeToNewsletter = asyncErrorMiddleware(
     try {
       const { email }: { email: string } = req.body;
 
-      // const alreadySubscribed = await prisma.newsletterSubscription.findFirst({
-      //   where: {
-      //     emailAddress: email,
-      //   },
-      // });
+      const alreadySubscribed = await prisma.newsletterSubscription.findMany({
+        where: {
+          emailAddress: email,
+        },
+      });
 
-      // if (alreadySubscribed) {
-      //   return res.status(400).json({
-      //     message: "Already Subscribed to Newsletter!",
-      //   });
-      // }
+      if (alreadySubscribed) {
+        return res.status(400).json({
+          message: "Already Subscribed to Newsletter!",
+        });
+      }
 
-      // const newsletterSubscription = await prisma.newsletterSubscription.create({
-      //   data: {
-      //     emailAddress: email,
-      //   },
-      // });
+      const newsletterSubscription = await prisma.newsletterSubscription.create(
+        {
+          data: {
+            emailAddress: email,
+          },
+        }
+      );
 
       res.status(201).json({
         message: "Thanks for Subscribing to our Newsletter!.",
+        data: newsletterSubscription
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
