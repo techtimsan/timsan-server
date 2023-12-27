@@ -20,7 +20,7 @@ import {
   resendVerificationEmail,
   resetPassword,
 } from "../controllers";
-import { isAuthenticated, isSuperAdmin } from "../middlewares";
+import { isAdmin, isAuthenticated, isSuperAdmin } from "../middlewares";
 // import {body, query, param, checkSchema} from 'express-validator'
 import { z } from "zod";
 
@@ -29,13 +29,13 @@ export const authRoute = Router({
   strict: true,
 });
 
-authRoute.get("/", getAllUsers);
+authRoute.get("/", isAuthenticated, isAdmin, getAllUsers);
 authRoute.post("/register", validateData(RegisterUserSchema), registerUser);
 authRoute.get("/verified", emailVerified);
 authRoute.get("/verify-email/:userId/:confirmationToken", verifyEmail);
 authRoute.post("/login", validateData(LoginUserSchema), loginUser);
 authRoute.get("/logout", isAuthenticated, logoutUser);
-authRoute.get("/refresh-token", refreshAccessToken);
+authRoute.get("/refresh-token", refreshAccessToken); // TODO: isAuthenticated?
 authRoute.get("/:userId", getUserById);
 authRoute.patch(
   "/reset-password/:userId",
@@ -56,6 +56,7 @@ authRoute.delete(
 authRoute.post(
   "/resend-email",
   validateData(resendVerificationLinkSchema),
+  isAuthenticated,
   resendVerificationEmail
 );
 

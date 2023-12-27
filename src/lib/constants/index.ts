@@ -22,7 +22,7 @@ export const TILETS_ROUTE = `${BASE_API_URL}/tilets`
 
 export const access_token = process.env.ACCESS_TOKEN as string
 export const access_token_expire = parseInt(
-  process.env.ACCESS_TOKEN_EXPIRE || "300",
+  process.env.ACCESS_TOKEN_EXPIRE || "3000",
   10
 )
 

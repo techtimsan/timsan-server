@@ -1,4 +1,5 @@
 import { Router } from "express"
+import { isAdmin, isAuthenticated } from "../middlewares"
 
 export const adminRoute = Router({
   caseSensitive: true,
@@ -6,10 +7,10 @@ export const adminRoute = Router({
 })
 
 // news
-adminRoute.post("/news/create",)
-adminRoute.patch("/news/update/:newsId")
-adminRoute.delete("/news/delete/:newsId")
+adminRoute.post("/", isAuthenticated, isAdmin)
+adminRoute.patch("/news/update/:newsId", isAuthenticated, isAdmin)
+adminRoute.delete("/news/delete/:newsId", isAuthenticated, isAdmin)
 // broadcasts
-adminRoute.post("/broadcast/create")
-adminRoute.patch("/broadcast/update/:broadcastId")
-adminRoute.delete("/broadcast/delete/:broadcastId")
+adminRoute.post("/broadcast/create", isAuthenticated, isAdmin)
+adminRoute.patch("/broadcast/update/:broadcastId", isAuthenticated, isAdmin)
+adminRoute.delete("/broadcast/delete/:broadcastId", isAuthenticated, isAdmin)

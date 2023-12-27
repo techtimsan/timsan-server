@@ -36,8 +36,8 @@ export const verifyAccessOrRefreshToken = (token: string, secret: string) => {
       iat: number,
       exp: number,
     }
-  } catch (error) {
-    console.log("Error verifying jwt : ", error)
+  } catch (error: any) {
+    console.log(error.message)
     return null
   }
 }

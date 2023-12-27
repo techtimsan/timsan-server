@@ -27,6 +27,7 @@ import { redisStore } from "../lib/redis";
 import jwt from "jsonwebtoken";
 import { cloudUpload } from "../lib/upload";
 import argon from "argon2";
+import { User } from "@prisma/client";
 
 export const registerUser = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -274,7 +275,9 @@ export const resendVerificationEmail = asyncErrorMiddleware(
       });
 
       // TODO:
-      return next(new ErrorHandler("Verification Email has been re-sent.", 400))
+      return res.status(200).json({
+        message: "Verification Email has been re-sent."
+      })
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -441,6 +444,8 @@ export const getUserById = asyncErrorMiddleware(
           email: true,
           emailVerified: true,
           password: true,
+          isAdmin: true,
+          isSuperAdmin: true
         },
       });
 
@@ -586,3 +591,35 @@ export const getUserInfo = asyncErrorMiddleware(
     }
   }
 );
+
+export const updateUserById = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {
+      id, role, profileStatus, isAdmin, isSuperAdmin
+    }: User = req.body
+
+    const userExists = await prisma.user.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if (!userExists) return next(new ErrorHandler("Invalid credentials - Nonexistent", 400))
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id
+      },
+      data: {
+        isAdmin, isSuperAdmin
+      }
+    })
+
+    res.status(200).json({
+      message: "Updated User Successfully",
+      data: updatedUser
+    })
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 400))
+  }
+})
