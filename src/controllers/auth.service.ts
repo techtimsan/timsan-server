@@ -592,7 +592,7 @@ export const getUserInfo = asyncErrorMiddleware(
   }
 );
 
-export const updateUserById = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+export const assignAdminOrSuperAdmin = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {
       id, role, profileStatus, isAdmin, isSuperAdmin
