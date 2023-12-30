@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testingCloudUpload = exports.deleteBroadcast = exports.editBroadcast = exports.createBroadcast = exports.getAllBroadcasts = exports.getBroadcastById = exports.deleteNewsPost = exports.editNewsPost = exports.createNewsPost = exports.getAllNewsPosts = exports.getNewsPostById = void 0;
+exports.deleteBroadcast = exports.editBroadcast = exports.createBroadcast = exports.getAllBroadcasts = exports.getBroadcastById = exports.deleteNewsPost = exports.editNewsPost = exports.createNewsPost = exports.getAllNewsPosts = exports.getNewsPostById = void 0;
 const middlewares_1 = require("../middlewares");
 const db_1 = require("../lib/db");
 const utils_1 = require("../utils");
@@ -43,16 +43,13 @@ exports.getAllNewsPosts = (0, middlewares_1.asyncErrorMiddleware)(async (req, re
 });
 exports.createNewsPost = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { title, desc, author,
-        // userId 
-        // userLikeId,
-        // userDislikeId,
-         } = req.body;
+        const userId = req.user?.id;
+        // console.log("the user is", req.user, "the id is", req.user?.id)
+        const { title, desc, author, } = req.body;
         let thumbnailUrl = '';
         if (req.file) {
             const file = req.file;
-            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'news-thumbnails');
+            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'news-thumbnails', userId);
         }
         const newsPost = await db_1.prisma.post.create({
             data: {
@@ -60,9 +57,9 @@ exports.createNewsPost = (0, middlewares_1.asyncErrorMiddleware)(async (req, res
                 desc,
                 thumbnailUrl,
                 author,
-                userLikeId: "",
-                userDislikeId: "",
-                userId: "123456"
+                userLikeId: userId,
+                userDislikeId: userId,
+                userId,
             }
         });
         if (newsPost) {
@@ -81,11 +78,8 @@ exports.createNewsPost = (0, middlewares_1.asyncErrorMiddleware)(async (req, res
 exports.editNewsPost = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
         const { postId } = req.params;
-        const { title, desc, author,
-        // userId,
-        // userLikeId,
-        // userDislikeId,
-         } = req.body;
+        const userId = req.user?.id;
+        const { title, desc, author, } = req.body;
         const post = await db_1.prisma.post.findFirst({
             where: {
                 id: postId
@@ -93,10 +87,10 @@ exports.editNewsPost = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, 
         });
         if (!post)
             return next(new utils_1.ErrorHandler("Post not found", 404));
-        let thumbnailUrl = '';
+        let thumbnailUrl = post.thumbnailUrl;
         if (req.file) {
             const file = req.file;
-            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'news-thumbnails');
+            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'news-thumbnails', userId);
         }
         const updatedPost = await db_1.prisma.post.update({
             where: {
@@ -107,9 +101,6 @@ exports.editNewsPost = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, 
                 desc,
                 thumbnailUrl,
                 author,
-                // userId,
-                // userLikeId,
-                // userDislikeId,
             },
         });
         if (updatedPost) {
@@ -190,11 +181,12 @@ exports.getAllBroadcasts = (0, middlewares_1.asyncErrorMiddleware)(async (req, r
 });
 exports.createBroadcast = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
+        const userId = ""; //for testing
         const { title, desc, author } = req.body;
         let thumbnailUrl = '';
         if (req.file) {
             const file = req.file;
-            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'broadcast-thumbnails');
+            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'broadcast-thumbnails', userId);
         }
         const broadcast = await db_1.prisma.broadcast.create({
             data: {
@@ -219,12 +211,8 @@ exports.createBroadcast = (0, middlewares_1.asyncErrorMiddleware)(async (req, re
 exports.editBroadcast = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
         const { broadcastId } = req.params;
+        const userId = ""; //for testing
         const { title, desc, author } = req.body;
-        let thumbnailUrl = '';
-        if (req.file) {
-            const file = req.file;
-            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'broadcast-thumbnails');
-        }
         const broadcast = await db_1.prisma.broadcast.findFirst({
             where: {
                 id: broadcastId
@@ -232,6 +220,11 @@ exports.editBroadcast = (0, middlewares_1.asyncErrorMiddleware)(async (req, res,
         });
         if (!broadcast)
             return next(new utils_1.ErrorHandler("Broadcast not found", 404));
+        let thumbnailUrl = broadcast.thumbnailUrl;
+        if (req.file) {
+            const file = req.file;
+            thumbnailUrl = await (0, upload_1.uploadToCloudinary)(file, 'broadcast-thumbnails', userId);
+        }
         const updatedBroadcast = await db_1.prisma.broadcast.update({
             where: {
                 id: broadcastId
@@ -283,28 +276,25 @@ exports.deleteBroadcast = (0, middlewares_1.asyncErrorMiddleware)(async (req, re
         return next(new utils_1.ErrorHandler('Internal Server Error', 500));
     }
 });
-exports.testingCloudUpload = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
-    try {
-        // let thumbnailUrl = '';
-        if (req.file) {
-            const file = req.body.file;
-            const binaryData = Buffer.from(file, 'base64');
-            const thumbnailUrl = await upload_1.cloudUpload.uploader.upload(binaryData.toString("utf-8"), {
-                folder: "test-folder",
-            });
-            res.status(201).json({
-                success: true,
-                message: 'Cloudinary is working',
-                data: thumbnailUrl
-            });
-        }
-    }
-    catch (error) {
-        console.error("kini error yen", error);
-        return next(new utils_1.ErrorHandler('Internal Server Error', 500));
-    }
-});
-//   // Specify the path where you want to save the file
-//   const filePath = path.join(__dirname, 'uploads', fileName);
-//   // Write the binary data to the file
-//   fs.writeFile(filePath, binaryDa
+// export const testingCloudUpload = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         // let thumbnailUrl = '';
+//         if (req.file) {
+//             const uploadedFile: FileUploadFormat = req.file;
+//             const thumbnails = await uploadToCloudinary(uploadedFile, "test-folder")
+//             if (thumbnails){
+//                 res.status(201).json({ 
+//                     success: true,
+//                     message: 'Cloudinary is working', 
+//                     data: thumbnails
+//                 })
+//             }
+//             } else{
+//                 return res.status(400).json({ success: false, message: 'No file uploaded.' });
+//             } 
+//         }
+//         catch (error: any) {
+//         console.error("kini error yen", error)
+//         return next(new ErrorHandler('Internal Server Error', 500));
+//       }
+// })

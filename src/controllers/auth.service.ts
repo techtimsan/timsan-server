@@ -543,6 +543,44 @@ export const resetPassword = asyncErrorMiddleware(
   }
 );
 
+// forgot password
+export const forgotPassword = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {email}: { email: string} = req.body
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email
+      },
+   select: {
+    email: true
+   }
+    })
+
+    if (!user) {
+      return next(new ErrorHandler("Invalid Credentials", 400))
+    }
+
+    // send email
+    const link = {
+            forgotPasswordLink: `https://timsan.com.ng/forgot-password?token=`
+    }
+    
+    await sendEmail({
+      emailAddress: email,
+      subject: "Forgot Password",
+      template: "forgot-password.ejs", // TODO: create file
+      data: {}
+    })
+
+    res.status(200).json({
+      message: "Reset Password - Email has been sent! to your Email..."
+    })
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 400))
+  }
+})
+
 // update profile picture / avatar
 export const updateProfilePic = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -42,6 +42,8 @@ authRoute.patch(
   validateData(ResetPasswordSchema),
   resetPassword
 );
+// forgot password
+authRoute.patch('/forgot-password/:userId')
 authRoute.delete(
   "/:userId",
   validateData(
