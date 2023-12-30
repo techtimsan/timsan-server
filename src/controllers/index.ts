@@ -10,6 +10,7 @@ export {
   resendVerificationEmail,
   resetPassword,
   emailVerified,
+  assignAdminOrSuperAdmin,
 } from "./auth.service";
 export {
   createNewConference,
@@ -48,7 +49,7 @@ export {
   subscribeToNewsletter,
   getAllNewsletterSubscribers,
 } from "./newsletter.service";
-export { getAllInstitutions } from "./profile.service";
+export { addInstitution, getAllInstitutions } from "./profile.service";
 export { addNewBook, getAllBooks } from "./e-library.service";
 export { addTiletCourse, getAllTiletCourses } from "./tilets.service";
 

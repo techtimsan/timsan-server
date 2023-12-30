@@ -19,6 +19,7 @@ import {
   emailVerified,
   resendVerificationEmail,
   resetPassword,
+  assignAdminOrSuperAdmin,
 } from "../controllers";
 import { isAdmin, isAuthenticated, isSuperAdmin } from "../middlewares";
 // import {body, query, param, checkSchema} from 'express-validator'
@@ -29,7 +30,7 @@ export const authRoute = Router({
   strict: true,
 });
 
-authRoute.get("/", isAuthenticated, isAdmin, getAllUsers);
+authRoute.get("/",  getAllUsers);
 authRoute.post("/register", validateData(RegisterUserSchema), registerUser);
 authRoute.get("/verified", emailVerified);
 authRoute.get("/verify-email/:userId/:confirmationToken", verifyEmail);
@@ -61,5 +62,7 @@ authRoute.post(
   isAuthenticated,
   resendVerificationEmail
 );
+// assign admin
+authRoute.patch("/admin", assignAdminOrSuperAdmin)
 
 // email verification

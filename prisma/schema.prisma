@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("EXTERNAL_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -110,7 +110,7 @@ model ExcoProfile {
   institutionId    String
   stateProfileId   String
   zoneProfileId    String
-  status ExcoStatus // still in
+  status ExcoStatus @default(ACTIVE)
   necProfileId     String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt

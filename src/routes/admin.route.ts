@@ -14,3 +14,4 @@ adminRoute.delete("/news/delete/:newsId", isAuthenticated, isAdmin)
 adminRoute.post("/broadcast/create", isAuthenticated, isAdmin)
 adminRoute.patch("/broadcast/update/:broadcastId", isAuthenticated, isAdmin)
 adminRoute.delete("/broadcast/delete/:broadcastId", isAuthenticated, isAdmin)
+// adminRoute
