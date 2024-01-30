@@ -30,7 +30,7 @@ export const authRoute = Router({
   strict: true,
 });
 
-authRoute.get("/",  getAllUsers);
+authRoute.get("/", isAuthenticated, getAllUsers);
 authRoute.post("/register", validateData(RegisterUserSchema), registerUser);
 authRoute.get("/verified", emailVerified);
 authRoute.get("/verify-email/:userId/:confirmationToken", verifyEmail);
@@ -44,7 +44,7 @@ authRoute.patch(
   resetPassword
 );
 // forgot password
-authRoute.patch('/forgot-password/:userId')
+authRoute.patch("/forgot-password/:userId");
 authRoute.delete(
   "/:userId",
   validateData(
@@ -63,6 +63,6 @@ authRoute.post(
   resendVerificationEmail
 );
 // assign admin
-authRoute.patch("/admin", assignAdminOrSuperAdmin)
+authRoute.patch("/admin", assignAdminOrSuperAdmin);
 
 // email verification

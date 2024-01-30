@@ -65,7 +65,7 @@ export const sendAccessAndRefreshToken = (
   statusCode: number,
   res: Response
 ) => {
-  const accessToken = jwt.sign(user, access_token, { expiresIn: "5m" })
+  const accessToken = jwt.sign(user, access_token, { expiresIn: "3d" })
   const refreshToken = jwt.sign(user, refresh_token, { expiresIn: "3d" })
 
   // upload session to redis
