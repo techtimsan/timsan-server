@@ -30,7 +30,7 @@ export const authRoute = Router({
   strict: true,
 });
 
-authRoute.get("/",  getAllUsers);
+authRoute.get("/",isAuthenticated,  getAllUsers);
 authRoute.post("/register", validateData(RegisterUserSchema), registerUser);
 authRoute.get("/verified", emailVerified);
 authRoute.get("/verify-email/:userId/:confirmationToken", verifyEmail);
