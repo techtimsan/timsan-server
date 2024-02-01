@@ -33,6 +33,7 @@ model User {
   stateProfile       StateProfile[]
   zoneProfile ZoneProfile[]
   necProfile NecProfile[]
+  techFellowship IOTBTechFellowship[]
   subscribedNewsletter Boolean @default(false)
 }
 
@@ -73,7 +74,7 @@ model InstitutionProfile {
   phoneNumber     String
   avatarUrl       String          @default("")
   stateProfileId  String
-  userId          String
+  userId          String // ? which user?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   institutionName INSTITUTIONS
@@ -106,7 +107,7 @@ model ExcoProfile {
   email            String             @unique
   phoneNumber      String
   avatarUrl        String
-  eventId          String
+  eventId          String?
   institutionId    String
   stateProfileId   String
   zoneProfileId    String
@@ -114,7 +115,7 @@ model ExcoProfile {
   necProfileId     String
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  events           Event              @relation(fields: [eventId], references: [id])
+  events           Event?              @relation(fields: [eventId], references: [id])
   institution      InstitutionProfile @relation(fields: [institutionId], references: [id])
   necProfile       NecProfile         @relation(fields: [necProfileId], references: [id])
   stateProfile     StateProfile       @relation(fields: [stateProfileId], references: [id])
@@ -598,6 +599,62 @@ model TiletCourse {
   level TiletCourseLevel
   rating Int
   instructor String // TODO: String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum CurrentJobSituation {
+  STUDENT
+  EMPLOYED
+  UNEMPLOYED
+  SELF_EMPLOYED
+}
+
+enum EducationalBackground {
+  O_LEVEL
+  BSC
+  MSC
+  ASSOCIATE
+  PHD
+  PROFESSIONAL_CERTIFICATION
+  OTHERS
+}
+
+enum ITSkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+enum CollaborationTool {
+  ZOOM
+  GOOGLE_MEET
+  MICROSOFT_TEAMS
+  FREE_CONFERENCE_CALL
+  SLACKS
+  OTHERS
+}
+
+model IOTBTechFellowship {
+  id String @id @default(cuid())
+  currentJobSituation CurrentJobSituation
+  stateOfResidence String
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  institutionOrCompany String?
+  educationalBackground EducationalBackground
+  itSkillLevel ITSkillLevel
+  specialization String?
+  mentor Boolean
+  ownLaptop Boolean
+  laptopSpec String
+  committed Boolean
+  challenge String
+  techJourney String
+  realtimeSolution String
+  collaborationTool CollaborationTool
+  feedbackAndInquiry String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

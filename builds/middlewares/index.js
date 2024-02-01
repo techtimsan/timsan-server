@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateFields = exports.isAdmin = exports.isAuthenticated = exports.asyncErrorMiddleware = exports.errorMiddleware = void 0;
+exports.uploadImage = exports.isSuperAdmin = exports.isAdmin = exports.isAuthenticated = exports.asyncErrorMiddleware = exports.errorMiddleware = void 0;
 var error_middleware_1 = require("./error.middleware");
 Object.defineProperty(exports, "errorMiddleware", { enumerable: true, get: function () { return error_middleware_1.errorMiddleware; } });
 var asyncError_middleware_1 = require("./asyncError.middleware");
@@ -8,4 +8,6 @@ Object.defineProperty(exports, "asyncErrorMiddleware", { enumerable: true, get: 
 var auth_middleware_1 = require("./auth.middleware");
 Object.defineProperty(exports, "isAuthenticated", { enumerable: true, get: function () { return auth_middleware_1.isAuthenticated; } });
 Object.defineProperty(exports, "isAdmin", { enumerable: true, get: function () { return auth_middleware_1.isAdmin; } });
-Object.defineProperty(exports, "validateFields", { enumerable: true, get: function () { return auth_middleware_1.validateFields; } });
+Object.defineProperty(exports, "isSuperAdmin", { enumerable: true, get: function () { return auth_middleware_1.isSuperAdmin; } });
+var uploadImage_middleware_1 = require("./uploadImage.middleware");
+Object.defineProperty(exports, "uploadImage", { enumerable: true, get: function () { return uploadImage_middleware_1.uploadImage; } });

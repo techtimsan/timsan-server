@@ -15,11 +15,11 @@ import {
 export const createNecProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.user;
+      // const user = req.user;
 
-      if (!user) return next(new ErrorHandler("Unauthenticated", 400));
+      // if (!user) return next(new ErrorHandler("Unauthenticated", 400));
 
-      const userId = user.id;
+      // const userId = user.id;
 
       const { address, email, phoneNumber, avatarUrl }: NecProfileData =
         req.body;
@@ -41,7 +41,7 @@ export const createNecProfile = asyncErrorMiddleware(
           email,
           phoneNumber,
           avatarUrl,
-          userId,
+          userId: "clrhw7u0i0000mm54lzpz4xah",
         },
       });
 
@@ -55,14 +55,30 @@ export const createNecProfile = asyncErrorMiddleware(
   }
 );
 
+export const getNecProfile = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log("req user: ", req.user);
+      const necProfiles = await prisma.necProfile.findMany();
+
+      res.status(200).json({
+        message: "Fetched Nec Profiles Successfully!",
+        data: necProfiles,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 export const createZoneProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.user;
+      // const user = req.user;
 
-      if (!user) return next(new ErrorHandler("Unauthenticated", 400));
+      // if (!user) return next(new ErrorHandler("Unauthenticated", 400));
 
-      const userId = user.id;
+      // const userId = user.id;
 
       const { address, email, phoneNumber, zone, avatarUrl }: ZoneProfileData =
         req.body;
@@ -85,7 +101,7 @@ export const createZoneProfile = asyncErrorMiddleware(
           email,
           phoneNumber,
           avatarUrl,
-          userId,
+          userId: "clrhw7u0i0000mm54lzpz4xah",
         },
       });
 
@@ -99,14 +115,29 @@ export const createZoneProfile = asyncErrorMiddleware(
   }
 );
 
+export const getAllZoneProfile = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const zoneProfiles = await prisma.zoneProfile.findMany({});
+
+      res.status(200).json({
+        message: "Fetched Zone Profiles successfully!",
+        data: zoneProfiles,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 export const createStateProfile = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.user;
+      // const user = req.user;
 
-      if (!user) return next(new ErrorHandler("Unauthenticated", 400));
+      // if (!user) return next(new ErrorHandler("Unauthenticated", 400));
 
-      const userId = user.id;
+      // const userId = user.id;
 
       const {
         address,
@@ -138,7 +169,7 @@ export const createStateProfile = asyncErrorMiddleware(
           email,
           phoneNumber,
           avatarUrl,
-          userId,
+          userId: "clrhw7u0i0000mm54lzpz4xah",
         },
       });
 
@@ -152,17 +183,44 @@ export const createStateProfile = asyncErrorMiddleware(
   }
 );
 
-export const createExcorofile = asyncErrorMiddleware(
+export const getStateProfiles = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.user;
+      const stateProfiles = await prisma.stateProfile.findMany({});
 
-      if (!user) return next(new ErrorHandler("Unauthenticated", 400));
+      res.status(200).json({
+        message: "Fetched State Profiles Successfully!",
+        data: stateProfiles,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
-      const userId = user.id;
+export const createExcoProfile = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // const user = req.user;
+
+      // if (!user) return next(new ErrorHandler("Unauthenticated", 400));
+
+      // const userId = user.id;
 
       const {
-        avatarUrl, courseOfStudy, email, firstName, graduationDate, graduationStatus, lastName, occupation, phoneNumber, post, stateOfOrigin, stateOfResidence, otherNames
+        avatarUrl,
+        courseOfStudy,
+        email,
+        firstName,
+        graduationDate,
+        graduationStatus,
+        lastName,
+        occupation,
+        phoneNumber,
+        post,
+        stateOfOrigin,
+        stateOfResidence,
+        otherNames,
       }: ExcoProfileData = req.body;
 
       const profileExists = await prisma.excoProfile.findFirst({
@@ -178,7 +236,16 @@ export const createExcorofile = asyncErrorMiddleware(
 
       const excoProfile = await prisma.excoProfile.create({
         data: {
-          courseOfStudy, firstName, graduationDate, graduationStatus, lastName, occupation, post, stateOfOrigin, stateOfResidence, otherNames,
+          courseOfStudy,
+          firstName,
+          graduationDate,
+          graduationStatus,
+          lastName,
+          occupation,
+          post,
+          stateOfOrigin,
+          stateOfResidence,
+          otherNames,
           email,
           phoneNumber,
           avatarUrl,
@@ -186,13 +253,28 @@ export const createExcorofile = asyncErrorMiddleware(
           institutionId: "",
           necProfileId: "",
           stateProfileId: "",
-          zoneProfileId: ""
+          zoneProfileId: "",
         },
       });
 
       res.status(201).json({
-        message: "Created State Profile Successfully",
+        message: "Created Exco Profile Successfully",
         data: excoProfile,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+export const getExcoProfiles = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const excoProfiles = await prisma.excoProfile.findMany({});
+
+      res.status(200).json({
+        message: "Fetched Exco Profiles Successfully!",
+        data: excoProfiles,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -262,6 +344,21 @@ export const createPatronProfile = asyncErrorMiddleware(
   }
 );
 
+export const getPatronProfiles = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const patronProfiles = await prisma.patronProfile.findMany({});
+
+      res.status(200).json({
+        message: "Fetched Patron Profiles Successfully!",
+        data: patronProfiles,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 export const addInstitution = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -316,17 +413,68 @@ export const addInstitution = asyncErrorMiddleware(
 export const getAllInstitutions = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const institutions = await prisma.institutionProfile.findMany({
-      //   select: {
-      //     institutionName: true,
-      //     lat: true,
-      //     long: true,
-      //   },
-      // });
+      const institutions = await prisma.institutionProfile.findMany({
+        select: {
+          institutionName: true,
+          lat: true,
+          long: true,
+        },
+      });
 
       res.status(200).json({
         message: "Fetched Institutions Successfully!",
-        data: [],
+        data: institutions,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+export const getAllExcos = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const excos = await prisma.excoProfile.findMany();
+
+      return res.status(200).json({
+        message: "Fetched Excos Successfully! 😊",
+        data: excos,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+export const getExcoByEmail = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(200).json({
+        message: "work on endpoint",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+export const updateExcoProfile = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(200).json({
+        message: "work on endpoint",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+export const deleteExcoProfile = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(200).json({
+        message: "work on endpoint",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

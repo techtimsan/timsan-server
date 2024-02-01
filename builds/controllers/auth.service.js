@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserInfo = exports.updateProfilePic = exports.resetPassword = exports.deleteUserById = exports.getUserById = exports.getAllUsers = exports.refreshAccessToken = exports.logoutUser = exports.loginUser = exports.confirmEmail = exports.registerUser = void 0;
+exports.updateUserById = exports.getUserInfo = exports.updateProfilePic = exports.resetPassword = exports.deleteUserById = exports.getUserById = exports.getAllUsers = exports.refreshAccessToken = exports.logoutUser = exports.loginUser = exports.resendVerificationEmail = exports.emailVerified = exports.verifyEmail = exports.registerUser = void 0;
 const middlewares_1 = require("../middlewares");
 const utils_1 = require("../utils");
 const db_1 = require("../lib/db");
@@ -17,98 +17,184 @@ const upload_1 = require("../lib/upload");
 const argon2_2 = __importDefault(require("argon2"));
 exports.registerUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password } = req.body;
-        // email / user exists 
-        const emailSent = await redis_1.redisStore.get(email);
-        if (emailSent)
-            return next(new utils_1.ErrorHandler("Confirmation Email Already sent", 400));
-        const emailExists = await db_1.prisma.user.findUnique({
-            where: {
-                email,
-            },
-            select: {
-                email: true,
-            },
+        const { firstName, lastName, email, password, accountType, } = req.body;
+        switch (accountType) {
+            case "MEMBER":
+                const emailExists = await db_1.prisma.user.findUnique({
+                    where: {
+                        email,
+                    },
+                    select: {
+                        email: true,
+                    },
+                });
+                if (emailExists)
+                    return next(new utils_1.ErrorHandler("Email already exists", 400));
+                const hashedPassword = await argon2_2.default.hash(password);
+                // create new user
+                const user = await db_1.prisma.user.create({
+                    data: {
+                        firstName,
+                        lastName,
+                        email,
+                        password: hashedPassword,
+                    },
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        emailVerified: true,
+                    },
+                });
+                const { id: userId, firstName: firstname, lastName: lastname, email: emailAddress, emailVerified, } = user;
+                // expires in 3 days
+                const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000;
+                // generate email confirmation token
+                const confirmationToken = (0, token_1.generateEmailConfirmationToken)({
+                    email: emailAddress,
+                    firstName: firstname,
+                    lastName: lastname,
+                    emailVerified,
+                });
+                // save new user to redis
+                const redisUserData = await redis_1.redisStore.set(userId, JSON.stringify({
+                    userId,
+                    id: userId,
+                    firstName,
+                    lastName,
+                    email,
+                    emailVerified,
+                    token: confirmationToken,
+                    expiresAt,
+                }));
+                const templateData = {
+                    firstName,
+                    emailConfirmationLink: `${constants_1.BASE_SERVER_URL}${constants_1.BASE_API_URL}/user/verify-email/${userId}/${confirmationToken}`,
+                };
+                // send activation email
+                await (0, mail_1.sendEmail)({
+                    emailAddress: email,
+                    subject: "Account Activation",
+                    template: "activation-mail.ejs",
+                    data: templateData,
+                });
+                res.status(201).json({
+                    success: true,
+                    message: `Check your mail to verify your email address`,
+                    result: redisUserData,
+                    link: templateData.emailConfirmationLink,
+                });
+                break;
+            default:
+                next(new utils_1.ErrorHandler("Invalid account type provided.", 400));
+                break;
+        }
+    }
+    catch (error) {
+        return next(new utils_1.ErrorHandler(error.message, 400));
+    }
+});
+exports.verifyEmail = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
+    try {
+        const { userId, confirmationToken } = req.params;
+        // check if email is in redis server
+        const userExists = await redis_1.redisStore.get(userId);
+        if (!userExists) {
+            const errorMessage = "Email does not exist";
+            res.redirect(`${constants_1.BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`);
+        }
+        // check if token is not expired
+        const userData = JSON.parse(userExists);
+        const expired = Date.now() >= userData.expiresAt;
+        if (expired) {
+            const errorMessage = "Confirmation Token already expired";
+            res.redirect(`${constants_1.BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`);
+        }
+        const verifiedToken = (0, token_1.verifyEmailConfirmationToken)(confirmationToken);
+        if (!verifiedToken) {
+            const errorMessage = "Invalid Confirmation Token";
+            res.redirect(`${constants_1.BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${errorMessage}`);
+        }
+        if (verifiedToken && userData.emailVerified !== true) {
+            const verifiedUser = await db_1.prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    emailVerified: true,
+                },
+            });
+            console.log("verified user : ", verifiedUser);
+            // update redis data
+            userData.emailVerified = verifiedUser.emailVerified;
+            const verifiedUserData = JSON.stringify(userData);
+            const updatedRedisUserData = await redis_1.redisStore.set(userId, verifiedUserData);
+            const successMessage = "Email Verified Successfully";
+            res.redirect(`${constants_1.BASE_SERVER_URL}/api/v1/user/verified?error=false&message=${successMessage}`);
+        }
+        else {
+            const verifiedMessage = "Email Already Verified";
+            res.redirect(`${constants_1.BASE_SERVER_URL}/api/v1/user/verified?error=true&message=${verifiedMessage}`);
+        }
+    }
+    catch (error) {
+        return next(new utils_1.ErrorHandler(error.message, 400));
+    }
+});
+exports.emailVerified = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
+    try {
+        const { error, message } = req.query;
+        const errorStatus = error === "true" ? true : false;
+        res.render("email-verified", {
+            error: errorStatus,
+            message,
         });
-        if (emailExists)
-            return next(new utils_1.ErrorHandler("Email already exists", 400));
-        const hashedPassword = await argon2_2.default.hash(password);
-        // create new user
-        const user = await db_1.prisma.user.create({
-            data: {
-                firstName,
-                lastName,
-                email,
-                password: hashedPassword
-            }
+    }
+    catch (error) {
+        return next(new utils_1.ErrorHandler(error.message, 400));
+    }
+});
+exports.resendVerificationEmail = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const isRegisteredUser = await db_1.prisma.user.findUnique({
+            where: { email },
         });
-        const { firstName: firstname, lastName: lastname, email: emailAddress, emailVerified } = user;
+        if (!isRegisteredUser) {
+            return next(new utils_1.ErrorHandler("User does not exist!", 400));
+        }
+        const { id: userId, firstName, lastName, emailVerified, } = JSON.parse(JSON.stringify(isRegisteredUser));
+        if (emailVerified)
+            res.status(400).json({
+                success: false,
+                message: "Email Alredy Verified Successfully",
+            });
         // generate email confirmation token
         const confirmationToken = (0, token_1.generateEmailConfirmationToken)({
-            email: emailAddress,
-            firstName: firstname,
-            lastName: lastname,
+            email: email,
+            firstName,
+            lastName,
+            emailVerified,
         });
         const templateData = {
             firstName,
-            emailConfirmationLink: `${constants_1.BASE_SERVER_URL}${constants_1.BASE_API_URL}/user/confirm-email/${confirmationToken}`,
+            emailConfirmationLink: `${constants_1.BASE_SERVER_URL}${constants_1.BASE_API_URL}/user/verify-email/${userId}/${confirmationToken}`,
         };
-        // expires in 3 days
-        const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000;
-        // save new user to redis
-        const redisUserData = await redis_1.redisStore.set(email, JSON.stringify({ firstName, lastName, email, emailVerified: false, token: confirmationToken, expiresAt }));
-        // send activation email    
-        const emailSuccess = await (0, mail_1.sendEmail)({
+        // resend email
+        await (0, mail_1.sendEmail)({
             emailAddress: email,
             subject: "Account Activation",
             template: "activation-mail.ejs",
             data: templateData,
         });
-        res.status(201).json({
-            success: true,
-            message: `Check your mail to verify your email address`,
+        // TODO:
+        return res.status(200).json({
+            message: "Verification Email has been re-sent."
         });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            error: error.message,
-        });
-    }
-});
-exports.confirmEmail = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
-    try {
-        const { token } = req.params;
-        const verifiedToken = (0, token_1.verifyEmailConfirmationToken)(token);
-        if (!verifiedToken)
-            return res.status(401).json({
-                message: "Invalid Token",
-            });
-        const { firstName, lastName, email } = verifiedToken;
-        // email already verified
-        const emailAlreadyVerified = await redis_1.redisStore.get(email);
-        if (!emailAlreadyVerified) {
-            const verifiedUser = await db_1.prisma.user.update({
-                where: {
-                    email
-                },
-                data: {
-                    emailVerified: true
-                }
-            });
-            res.status(200).json({
-                message: "Email Address Verified 😎",
-            });
-        }
-        res.status(400).json({
-            status: "failed",
-            message: "Email already verified"
-        });
-    }
-    catch (error) {
-        return res.status(500).json({
-            error: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.loginUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
@@ -128,31 +214,21 @@ exports.loginUser = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, nex
             },
         });
         if (!user) {
-            return res.status(404).json({
-                message: "Invalid Credentials! 😠",
-            });
+            return next(new utils_1.ErrorHandler("Invalid Credentials! 😠", 400));
         }
         if (user && !user.emailVerified) {
-            return res
-                .status(401)
-                .json({
-                message: "Verify your email! ⚠",
-            })
-                .redirect("/user/login");
+            return next(new utils_1.ErrorHandler("Check your mail to verify your email address ⚠", 401));
+            // .redirect("/user/login")
         }
         const isPassword = await argon2_1.default.verify(user.password, password);
         if (user && !isPassword) {
-            return res.status(401).json({
-                message: "Invalid Credentials! 😠",
-            });
+            return next(new utils_1.ErrorHandler("Invalid Credentials! 😠", 401));
         }
         const { id, email: emailAddress, emailVerified, firstName, lastName, } = user;
         (0, token_1.sendAccessAndRefreshToken)({ id, firstName, lastName, email }, 200, res);
     }
     catch (error) {
-        res.status(500).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 // logout user
@@ -179,7 +255,7 @@ exports.refreshAccessToken = (0, middlewares_1.asyncErrorMiddleware)(async (req,
         const errorMessage = `Could not Refresh Token`;
         if (!decoded)
             return next(new utils_1.ErrorHandler(errorMessage, 400));
-        const session = await redis_1.redisStore.get(decoded.user.id);
+        const session = await redis_1.redisStore.get(decoded.id);
         if (!session)
             return next(new utils_1.ErrorHandler(errorMessage, 400));
         const user = JSON.parse(session);
@@ -209,11 +285,15 @@ exports.getAllUsers = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, n
                 firstName: true,
                 lastName: true,
                 email: true,
+                emailVerified: true,
                 conferences: {
                     select: {
                         id: true,
                     },
                 },
+            },
+            orderBy: {
+                lastName: "asc",
             },
         });
         res.status(200).json({
@@ -232,11 +312,19 @@ exports.getUserById = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, n
             where: {
                 id: userId,
             },
+            select: {
+                firstName: true,
+                lastName: true,
+                conferences: true,
+                email: true,
+                emailVerified: true,
+                password: true,
+                isAdmin: true,
+                isSuperAdmin: true
+            },
         });
         if (!user) {
-            res.status(404).json({
-                message: "User does not exist!",
-            });
+            return next(new utils_1.ErrorHandler("User does not exist!", 400));
         }
         const { password, ...userWithoutPassword } = user;
         res.status(200).json({
@@ -245,9 +333,7 @@ exports.getUserById = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, n
         });
     }
     catch (error) {
-        res.status(400).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.deleteUserById = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
@@ -258,14 +344,14 @@ exports.deleteUserById = (0, middlewares_1.asyncErrorMiddleware)(async (req, res
                 id: userId,
             },
         });
+        // delete user redis data
+        await redis_1.redisStore.del(userId);
         res.status(200).json({
             message: "Deleted User Successfully!",
         });
     }
     catch (error) {
-        res.status(400).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.resetPassword = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
@@ -299,7 +385,7 @@ exports.resetPassword = (0, middlewares_1.asyncErrorMiddleware)(async (req, res,
         await redis_1.redisStore.set(user.id, JSON.stringify(updatedUser));
         res.status(200).json({
             success: true,
-            message: "Reset Password Successfully",
+            message: "Password Reset Successfully",
         });
     }
     catch (error) {
@@ -325,6 +411,9 @@ exports.updateProfilePic = (0, middlewares_1.asyncErrorMiddleware)(async (req, r
                 avatarUrl: avatar.secure_url,
             },
         });
+        res.status(200).json({
+            message: "Updated Profile pic successfully"
+        });
     }
     catch (error) {
         return next(new utils_1.ErrorHandler(error.message, 400));
@@ -335,6 +424,36 @@ exports.getUserInfo = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, n
     try {
         // const userId = req.user?.id
         // getUserById(userId, res, next)
+        res.status(200).json({
+            message: "Work on this endpoint..."
+        });
+    }
+    catch (error) {
+        return next(new utils_1.ErrorHandler(error.message, 400));
+    }
+});
+exports.updateUserById = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
+    try {
+        const { id, role, profileStatus, isAdmin, isSuperAdmin } = req.body;
+        const userExists = await db_1.prisma.user.findUnique({
+            where: {
+                id
+            }
+        });
+        if (!userExists)
+            return next(new utils_1.ErrorHandler("Invalid credentials - Nonexistent", 400));
+        const updatedUser = await db_1.prisma.user.update({
+            where: {
+                id
+            },
+            data: {
+                isAdmin, isSuperAdmin
+            }
+        });
+        res.status(200).json({
+            message: "Updated User Successfully",
+            data: updatedUser
+        });
     }
     catch (error) {
         return next(new utils_1.ErrorHandler(error.message, 400));

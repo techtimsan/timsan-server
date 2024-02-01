@@ -21,7 +21,7 @@ const verifyAccessOrRefreshToken = (token, secret) => {
         return decoded;
     }
     catch (error) {
-        console.log("Error verifying jwt : ", error);
+        console.log(error.message);
         return null;
     }
 };
@@ -31,13 +31,15 @@ exports.accessTokenOptions = {
     expires: new Date(Date.now() + constants_1.access_token_expire * 60 * 60 * 1000),
     maxAge: constants_1.access_token_expire * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
+    secure: true
 };
 exports.refreshTokenOptions = {
     expires: new Date(Date.now() + constants_1.refresh_token_expire * 24 * 60 * 60 * 1000),
     maxAge: constants_1.refresh_token_expire * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
+    secure: true
 };
 // send access token on login
 const sendAccessAndRefreshToken = (user, statusCode, res) => {
@@ -54,6 +56,7 @@ const sendAccessAndRefreshToken = (user, statusCode, res) => {
         success: true,
         user,
         accessToken,
+        message: "Logged in Successfully..."
     });
 };
 exports.sendAccessAndRefreshToken = sendAccessAndRefreshToken;
@@ -65,6 +68,7 @@ exports.generateEmailConfirmationToken = generateEmailConfirmationToken;
 const verifyEmailConfirmationToken = (confirmationToken) => {
     try {
         const decoded = jsonwebtoken_1.default.verify(confirmationToken, constants_1.jwt_secret);
+        console.log("decoded jwt data : ", decoded);
         return decoded;
     }
     catch (error) {

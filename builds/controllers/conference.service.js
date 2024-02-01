@@ -4,6 +4,7 @@ exports.deleteConferenceById = exports.getAllConferenceAttendee = exports.regist
 const middlewares_1 = require("../middlewares");
 const db_1 = require("../lib/db");
 const mail_1 = require("../lib/mail");
+const utils_1 = require("../utils");
 // admin middleware
 exports.createNewConference = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
@@ -14,9 +15,7 @@ exports.createNewConference = (0, middlewares_1.asyncErrorMiddleware)(async (req
             },
         });
         if (conferenceExists) {
-            return res.status(400).json({
-                message: "Conference Already Exists",
-            });
+            return next(new utils_1.ErrorHandler("Conference Already Exists", 400));
         }
         const conference = await db_1.prisma.conference.create({
             data: {
@@ -33,9 +32,7 @@ exports.createNewConference = (0, middlewares_1.asyncErrorMiddleware)(async (req
         });
     }
     catch (error) {
-        return res.status(400).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.getAllConference = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
@@ -47,9 +44,7 @@ exports.getAllConference = (0, middlewares_1.asyncErrorMiddleware)(async (req, r
         });
     }
     catch (error) {
-        return res.status(400).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.registerForConference = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
@@ -62,9 +57,7 @@ exports.registerForConference = (0, middlewares_1.asyncErrorMiddleware)(async (r
             },
         });
         if (!conferenceExists)
-            return res.status(404).json({
-                message: "Conference does not Exist!",
-            });
+            return next(new utils_1.ErrorHandler("Conference does not Exist!", 400));
         const alreadyRegistered = await db_1.prisma.conferenceAttendee.findFirst({
             where: {
                 attendeeId,
@@ -72,9 +65,7 @@ exports.registerForConference = (0, middlewares_1.asyncErrorMiddleware)(async (r
             },
         });
         if (alreadyRegistered)
-            res.status(400).json({
-                message: "Already Registered for this Conference",
-            });
+            return next(new utils_1.ErrorHandler("Already Registered for this Conference", 400));
         const newConferenceRegistration = await db_1.prisma.conferenceAttendee.create({
             data: {
                 attendeeId,
@@ -83,7 +74,13 @@ exports.registerForConference = (0, middlewares_1.asyncErrorMiddleware)(async (r
                 paymentStatus,
             },
         });
-        const conferenceMailData = { shortName: "ITAC", firstName: "Ridwan" };
+        const attendeeDetails = await db_1.prisma.user.findFirst({
+            where: {
+                id: attendeeId
+            }
+        });
+        const name = attendeeDetails?.firstName;
+        const conferenceMailData = { shortName: "ITAC", firstName: name };
         try {
             await (0, mail_1.sendEmail)({
                 emailAddress,
@@ -98,29 +95,41 @@ exports.registerForConference = (0, middlewares_1.asyncErrorMiddleware)(async (r
             });
         }
         catch (error) {
-            res.status(400).json({
-                error: error.message,
-            });
+            return next(new utils_1.ErrorHandler(error.message, 400));
         }
     }
     catch (error) {
-        return res.status(400).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.getAllConferenceAttendee = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
     try {
-        const attendees = await db_1.prisma.conferenceAttendee.findMany();
+        const attendees = await db_1.prisma.conferenceAttendee.findMany({
+            select: {
+                attendee: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                    }
+                },
+                paymentStatus: true,
+                membershipType: true
+            },
+            orderBy: {
+                attendee: {
+                    lastName: "asc"
+                }
+            }
+        });
         res.status(200).json({
             message: "Fetched Conference Attendees Successfully! 😇 ",
             data: attendees,
         });
     }
     catch (error) {
-        res.status(400).json({
-            message: error.message,
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });
 exports.deleteConferenceById = (0, middlewares_1.asyncErrorMiddleware)(async (req, res, next) => {
@@ -137,8 +146,6 @@ exports.deleteConferenceById = (0, middlewares_1.asyncErrorMiddleware)(async (re
         });
     }
     catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        return next(new utils_1.ErrorHandler(error.message, 400));
     }
 });

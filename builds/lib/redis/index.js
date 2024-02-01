@@ -10,4 +10,4 @@ const redisClient = () => {
     }
     throw new Error("Redis Server Connection failed...");
 };
-exports.redisStore = new ioredis_1.Redis(constants_1.EXTERNAL_REDIS_URL); // Default port is 6379
+exports.redisStore = new ioredis_1.Redis("rediss://red-cl7s2sf6e7vc73a0bitg:fxv8R9ir3jNlHMedu8PYYaXX5tjRRjPb@oregon-redis.render.com:6379"); // Default port is 6379

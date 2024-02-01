@@ -106,18 +106,20 @@ export const registerUser = asyncErrorMiddleware(
             })
           );
 
+          console.log(redisUserData);
+
           const templateData = {
             firstName,
             emailConfirmationLink: `${BASE_SERVER_URL}${BASE_API_URL}/user/verify-email/${userId}/${confirmationToken}`,
           };
 
           // send activation email
-          await sendEmail({
-            emailAddress: email,
-            subject: "Account Activation",
-            template: "activation-mail.ejs",
-            data: templateData,
-          });
+          // await sendEmail({
+          //   emailAddress: email,
+          //   subject: "Account Activation",
+          //   template: "activation-mail.ejs",
+          //   data: templateData,
+          // });
 
           res.status(201).json({
             success: true,
@@ -128,8 +130,8 @@ export const registerUser = asyncErrorMiddleware(
           break;
 
         default:
-           next(new ErrorHandler("Invalid account type provided.", 400));
-           break
+          next(new ErrorHandler("Invalid account type provided.", 400));
+          break;
       }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -237,7 +239,7 @@ export const resendVerificationEmail = asyncErrorMiddleware(
       });
 
       if (!isRegisteredUser) {
-       return next(new ErrorHandler("User does not exist!", 400))
+        return next(new ErrorHandler("User does not exist!", 400));
       }
 
       const {
@@ -276,8 +278,8 @@ export const resendVerificationEmail = asyncErrorMiddleware(
 
       // TODO:
       return res.status(200).json({
-        message: "Verification Email has been re-sent."
-      })
+        message: "Verification Email has been re-sent.",
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -445,12 +447,12 @@ export const getUserById = asyncErrorMiddleware(
           emailVerified: true,
           password: true,
           isAdmin: true,
-          isSuperAdmin: true
+          isSuperAdmin: true,
         },
       });
 
       if (!user) {
-        return next(new ErrorHandler("User does not exist!", 400))
+        return next(new ErrorHandler("User does not exist!", 400));
       }
 
       const { password, ...userWithoutPassword } = user!;
@@ -460,7 +462,7 @@ export const getUserById = asyncErrorMiddleware(
         data: userWithoutPassword,
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400))
+      return next(new ErrorHandler(error.message, 400));
     }
   }
 );
@@ -483,7 +485,7 @@ export const deleteUserById = asyncErrorMiddleware(
         message: "Deleted User Successfully!",
       });
     } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400))
+      return next(new ErrorHandler(error.message, 400));
     }
   }
 );
@@ -543,6 +545,46 @@ export const resetPassword = asyncErrorMiddleware(
   }
 );
 
+// forgot password
+export const forgotPassword = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email }: { email: string } = req.body;
+
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+        select: {
+          email: true,
+        },
+      });
+
+      if (!user) {
+        return next(new ErrorHandler("Invalid Credentials", 400));
+      }
+
+      // send email
+      const link = {
+        forgotPasswordLink: `https://timsan.com.ng/forgot-password?token=`,
+      };
+
+      await sendEmail({
+        emailAddress: email,
+        subject: "Forgot Password",
+        template: "forgot-password.ejs", // TODO: create file
+        data: {},
+      });
+
+      res.status(200).json({
+        message: "Reset Password - Email has been sent! to your Email...",
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 // update profile picture / avatar
 export const updateProfilePic = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -568,8 +610,8 @@ export const updateProfilePic = asyncErrorMiddleware(
       });
 
       res.status(200).json({
-        message: "Updated Profile pic successfully"
-      })
+        message: "Updated Profile pic successfully",
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -584,42 +626,44 @@ export const getUserInfo = asyncErrorMiddleware(
       // getUserById(userId, res, next)
 
       res.status(200).json({
-        message: "Work on this endpoint..."
-      })
+        message: "Work on this endpoint...",
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-export const assignAdminOrSuperAdmin = asyncErrorMiddleware(async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const {
-      id, role, profileStatus, isAdmin, isSuperAdmin
-    }: User = req.body
+export const assignAdminOrSuperAdmin = asyncErrorMiddleware(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id, role, profileStatus, isAdmin, isSuperAdmin }: User = req.body;
 
-    const userExists = await prisma.user.findUnique({
-      where: {
-        id
-      }
-    })
+      const userExists = await prisma.user.findUnique({
+        where: {
+          id,
+        },
+      });
 
-    if (!userExists) return next(new ErrorHandler("Invalid credentials - Nonexistent", 400))
+      if (!userExists)
+        return next(new ErrorHandler("Invalid credentials - Nonexistent", 400));
 
-    const updatedUser = await prisma.user.update({
-      where: {
-        id
-      },
-      data: {
-        isAdmin, isSuperAdmin
-      }
-    })
+      const updatedUser = await prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          isAdmin,
+          isSuperAdmin,
+        },
+      });
 
-    res.status(200).json({
-      message: "Updated User Successfully",
-      data: updatedUser
-    })
-  } catch (error: any) {
-    return next(new ErrorHandler(error.message, 400))
+      res.status(200).json({
+        message: "Updated User Successfully",
+        data: updatedUser,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
-})
+);

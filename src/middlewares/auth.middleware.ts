@@ -10,6 +10,7 @@ export const isAuthenticated = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const accessToken = req.cookies!.access_token as string;
+      console.log(accessToken);
 
       if (!accessToken)
         return next(new ErrorHandler("Login to Access Resource. ", 400));
@@ -65,19 +66,18 @@ export const isSuperAdmin = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (req.user) {
-
         const superAdmin = await prisma.user.findUnique({
           where: {
-            id: req.user.id
+            id: req.user.id,
           },
           select: {
             isSuperAdmin: true,
-            isAdmin: true
-          }
-        })
+            isAdmin: true,
+          },
+        });
 
         if (!superAdmin?.isSuperAdmin) {
-          console.log(superAdmin, req.user)
+          console.log(superAdmin, req.user);
           return next(new ErrorHandler("Be warned - Unauthorized", 401));
         }
 

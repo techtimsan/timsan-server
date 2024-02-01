@@ -49,39 +49,8 @@ export {
   subscribeToNewsletter,
   getAllNewsletterSubscribers,
 } from "./newsletter.service";
-export { addInstitution, getAllInstitutions } from "./profile.service";
+export { addInstitution, getAllInstitutions, createNecProfile, createPatronProfile, createStateProfile, createZoneProfile, createExcoProfile, deleteExcoProfile, getAllExcos, getExcoByEmail, updateExcoProfile, getAllZoneProfile, getNecProfile, getExcoProfiles, getPatronProfiles, getStateProfiles } from "./profile.service";
 export { addNewBook, getAllBooks } from "./e-library.service";
 export { addTiletCourse, getAllTiletCourses } from "./tilets.service";
 
-// export{
-// // nec
 
-// createNECProfile,
-// editNECProfile,
-// getNECProfile,
-
-// // zone
-
-// createZoneProfile,
-// editZoneProfile,
-// getZoneProfile,
-
-// // state
-
-// createStateProfile,
-// editStateProfile,
-// getStateProfile,
-
-// // institution
-
-// createInstitutionProfile,
-// editInstitutionProfile,
-// getInstitutionProfile,
-
-// // member
-
-// createMemberProfile,
-// editMemberProfile,
-// getMemberProfile
-
-// } from "./profile.service"
