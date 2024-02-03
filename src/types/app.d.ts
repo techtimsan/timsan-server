@@ -176,3 +176,24 @@ export type BroadcastData = {
   author: string,
 
 }
+
+export type IOTBTechApplication = {
+  currentJobSituation: "STUDENT" | "EMPLOYED" | "UNEMPLOYED" | "SELF_EMPLOYED",
+  stateOfResidence: string,
+  userId: string,
+  institutionOrCompany?: string,
+  educationalBackground: "O_LEVEL" | "BSC" | "MSC" | "ASSOCIATE"| "PHD" | "PROFESSIONAL_CERTIFICATION" | "OTHERS",
+  itSkillLevel: "BEGINNER" | "INTERMEDIATE" | "EXPERT",
+  specialization?: string,
+  mentor: boolean,
+  ownLaptop: boolean,
+  laptopSpec: string,
+  committed: boolean,
+  challenge: string,
+  techJourney: string,
+  realtimeSolution: string,
+  collaborationTool: "ZOOM" | "GOOGLE_MEET" | "MICROSOFT_TEAMS" | "FREE_CONFERENCE_CALL" | "SLACKS" | "OTHERS",
+  feedbackAndInquiry: string,
+  stack: "PRODUCT_DESIGN" | "GRAPHICS" | "WEB" | "CLOUD",
+  emailAddress: string
+}

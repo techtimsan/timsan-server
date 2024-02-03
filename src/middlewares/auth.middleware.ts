@@ -16,9 +16,9 @@ export const isAuthenticated = asyncErrorMiddleware(
         return next(new ErrorHandler("Login to Access Resource. ", 400));
 
       const decoded = verifyAccessOrRefreshToken(accessToken, access_token);
+      // console.log("mmmmmmmmmmmmm", decoded)
 
       if (!decoded) return next(new ErrorHandler("Invalid Access Token", 400));
-
       const userExists = await redisStore.get(decoded.id);
 
       if (!userExists)

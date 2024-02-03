@@ -299,6 +299,27 @@ export const CreateExcoProfileSchema = z.object({
   institutionId: z.string()
 });
 
+export const RegisterFellowshipSchema = z.object({
+  currentJobSituation: z.enum(["STUDENT", "EMPLOYED", "UNEMPLOYED", "SELF_EMPLOYED"]),
+  stateOfResidence: z.string(),
+  userId: z.string(),
+  institutionOrCompany: z.string().optional(),
+  educationalBackground: z.enum(["O_LEVEL", "BSC", "MSC", "ASSOCIATE", "PHD", "PROFESSIONAL_CERTIFICATION", "OTHERS"]),
+  itSkillLevel: z.enum(["BEGINNER", "INTERMEDIATE", "EXPERT"]),
+  specialization: z.string().optional(),
+  mentor: z.boolean(),
+  ownLaptop: z.boolean(),
+  laptopSpec: z.string(),
+  committed: z.boolean(),
+  challenge: z.string(),
+  techJourney: z.string(),
+  realtimeSolution: z.string(),
+  collaborationTool: z.enum(["ZOOM", "GOOGLE_MEET", "MICROSOFT_TEAMS", "FREE_CONFERENCE_CALL", "SLACKS", "OTHERS"]),
+  feedbackAndInquiry: z.string(),
+  stack: z.enum(["PRODUCT_DESIGN", "GRAPHICS", "WEB", "CLOUD"]),
+  emailAddress: z.string(),
+})
+
 export const validateData =
   (schema: Schema) =>
   async (req: Request, res: Response, next: NextFunction) => {

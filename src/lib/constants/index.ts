@@ -19,6 +19,8 @@ export const NEWSLETTER_ROUTE = `${BASE_API_URL}/newsletter`
 export const PROFILE_ROUTE = `${BASE_API_URL}/profile`
 export const ELIBRARY_ROUTE = `${BASE_API_URL}/elibrary`
 export const TILETS_ROUTE = `${BASE_API_URL}/tilets`
+export const IOTB_ROUTE = `${BASE_API_URL}/iotbtech`
+
 
 export const access_token = process.env.ACCESS_TOKEN as string
 export const access_token_expire = parseInt(
