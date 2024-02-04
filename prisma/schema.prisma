@@ -604,7 +604,7 @@ model TiletCourse {
   updatedAt DateTime @updatedAt
 }
 
-enum CurrentJobSituation {
+enum CurrentJobStatus {
   STUDENT
   EMPLOYED
   UNEMPLOYED
@@ -638,7 +638,7 @@ enum CollaborationTool {
 
 model IOTBTechFellowship {
   id String @id @default(cuid())
-  currentJobSituation CurrentJobSituation
+  currentJobStatus CurrentJobStatus
   stateOfResidence String
   userId String
   user User @relation(fields: [userId], references: [id])
