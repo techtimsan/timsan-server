@@ -52,5 +52,4 @@ export {
 export { addInstitution, getAllInstitutions, createNecProfile, createPatronProfile, createStateProfile, createZoneProfile, createExcoProfile, deleteExcoProfile, getAllExcos, getExcoByEmail, updateExcoProfile, getAllZoneProfile, getNecProfile, getExcoProfiles, getPatronProfiles, getStateProfiles } from "./profile.service";
 export { addNewBook, getAllBooks } from "./e-library.service";
 export { addTiletCourse, getAllTiletCourses } from "./tilets.service";
-
-
+export { registerForTechFellowship } from './iotbTech.service'

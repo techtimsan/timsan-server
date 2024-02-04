@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("EXTERNAL_DATABASE_URL")
 }
 
 model User {
@@ -636,6 +636,14 @@ enum CollaborationTool {
   OTHERS
 }
 
+enum Stack {
+  PRODUCT_DESIGN
+  GRAPHICS
+  WEB
+  CLOUD
+}
+
+
 model IOTBTechFellowship {
   id String @id @default(cuid())
   currentJobStatus CurrentJobStatus
@@ -655,6 +663,7 @@ model IOTBTechFellowship {
   realtimeSolution String
   collaborationTool CollaborationTool
   feedbackAndInquiry String
+  stack Stack
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

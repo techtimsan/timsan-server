@@ -2,8 +2,8 @@ import express, { Express, Request, Response, NextFunction } from "express"
 import morgan from "morgan"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { AUTH_ROUTE, BROADCAST_ROUTE, CONFERENCE_ROUTE, ELIBRARY_ROUTE, NEWSLETTER_ROUTE, NEWS_ROUTE, PROFILE_ROUTE, REDIS_ROUTE, TILETS_ROUTE } from "./lib/constants"
-import { authRoute, broadcastRoute, conferenceRoute, newsRoute, redisRoute } from "./routes"
+import { AUTH_ROUTE, BROADCAST_ROUTE, CONFERENCE_ROUTE, ELIBRARY_ROUTE, IOTB_ROUTE, NEWSLETTER_ROUTE, NEWS_ROUTE, PROFILE_ROUTE, REDIS_ROUTE, TILETS_ROUTE } from "./lib/constants"
+import { authRoute, broadcastRoute, conferenceRoute, iotbTechRoute, newsRoute, redisRoute } from "./routes"
 import path from "path"
 import { ErrorHandler } from "./utils"
 import { errorMiddleware } from "./middlewares"
@@ -68,6 +68,7 @@ app.use(NEWSLETTER_ROUTE, newsletterRoute)
 app.use(PROFILE_ROUTE, profileRoute)
 app.use(ELIBRARY_ROUTE, eLibraryRoute)
 app.use(TILETS_ROUTE, tiletsRoute)
+app.use(IOTB_ROUTE, iotbTechRoute)
 
 // healthcheck
 app.get("/", (req: Request, res: Response, next: NextFunction) => {

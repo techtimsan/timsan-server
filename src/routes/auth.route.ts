@@ -59,7 +59,7 @@ authRoute.delete(
 authRoute.post(
   "/resend-email",
   validateData(resendVerificationLinkSchema),
-  isAuthenticated,
+  // isAuthenticated,
   resendVerificationEmail
 );
 // assign admin
