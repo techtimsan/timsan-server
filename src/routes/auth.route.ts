@@ -3,6 +3,7 @@ import { validateRequestBody } from "zod-express-middleware";
 import {
   LoginUserSchema,
   RegisterUserSchema,
+  RequestResetLink,
   ResetPasswordSchema,
   resendVerificationLinkSchema,
   validateData,
@@ -24,6 +25,7 @@ import {
 import { isAdmin, isAuthenticated, isSuperAdmin } from "../middlewares";
 // import {body, query, param, checkSchema} from 'express-validator'
 import { z } from "zod";
+import { requestPasswordReset } from "../controllers/auth.service";
 
 export const authRoute = Router({
   caseSensitive: true,
@@ -39,12 +41,15 @@ authRoute.get("/logout", isAuthenticated, logoutUser);
 authRoute.get("/refresh-token", refreshAccessToken); // TODO: isAuthenticated?
 authRoute.get("/:userId", getUserById);
 authRoute.patch(
-  "/reset-password/:userId",
+  "/reset-password",
   validateData(ResetPasswordSchema),
   resetPassword
 );
+authRoute.post("/request-reset", validateData(RequestResetLink), requestPasswordReset); // sends a link
+
 // forgot password
-authRoute.patch("/forgot-password/:userId");
+// authRoute.post("/forgot-password", forgotPassword);
+
 authRoute.delete(
   "/:userId",
   validateData(

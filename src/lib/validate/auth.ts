@@ -25,8 +25,13 @@ export const formatZodError = (error: ZodError) => {
 };
 
 export const ResetPasswordSchema = z.object({
-  oldPassword: z.string().min(6),
+  token: z.string().min(6).max(6),
+  userId: z.string().cuid(),
   newPassword: z.string().min(6),
+});
+
+export const RequestResetLink = z.object({
+  email: z.string().email(),
 });
 
 export const RegisterUserSchema = z.object({
@@ -296,15 +301,28 @@ export const CreateExcoProfileSchema = z.object({
   stateOfOrigin: z.string(),
   stateOfResidence: z.string(),
   otherNames: z.string().optional(),
-  institutionId: z.string()
+  institutionId: z.string(),
 });
 
 export const RegisterFellowshipSchema = z.object({
-  currentJobSituation: z.enum(["STUDENT", "EMPLOYED", "UNEMPLOYED", "SELF_EMPLOYED"]),
+  currentJobSituation: z.enum([
+    "STUDENT",
+    "EMPLOYED",
+    "UNEMPLOYED",
+    "SELF_EMPLOYED",
+  ]),
   stateOfResidence: z.string(),
   userId: z.string(),
   institutionOrCompany: z.string().optional(),
-  educationalBackground: z.enum(["O_LEVEL", "BSC", "MSC", "ASSOCIATE", "PHD", "PROFESSIONAL_CERTIFICATION", "OTHERS"]),
+  educationalBackground: z.enum([
+    "O_LEVEL",
+    "BSC",
+    "MSC",
+    "ASSOCIATE",
+    "PHD",
+    "PROFESSIONAL_CERTIFICATION",
+    "OTHERS",
+  ]),
   itSkillLevel: z.enum(["BEGINNER", "INTERMEDIATE", "EXPERT"]),
   specialization: z.string().optional(),
   mentor: z.boolean(),
@@ -314,11 +332,18 @@ export const RegisterFellowshipSchema = z.object({
   challenge: z.string(),
   techJourney: z.string(),
   realtimeSolution: z.string(),
-  collaborationTool: z.enum(["ZOOM", "GOOGLE_MEET", "MICROSOFT_TEAMS", "FREE_CONFERENCE_CALL", "SLACKS", "OTHERS"]),
+  collaborationTool: z.enum([
+    "ZOOM",
+    "GOOGLE_MEET",
+    "MICROSOFT_TEAMS",
+    "FREE_CONFERENCE_CALL",
+    "SLACKS",
+    "OTHERS",
+  ]),
   feedbackAndInquiry: z.string(),
   stack: z.enum(["PRODUCT_DESIGN", "GRAPHICS", "WEB", "CLOUD"]),
   emailAddress: z.string(),
-})
+});
 
 export const validateData =
   (schema: Schema) =>

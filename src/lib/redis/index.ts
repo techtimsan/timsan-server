@@ -10,4 +10,4 @@ export const redisClient = () => {
 
   throw new Error("Redis Server Connection failed...");
 };
-export const redisStore = new Redis(EXTERNAL_REDIS_URL);
+export const redisStore = new Redis();

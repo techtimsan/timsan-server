@@ -5,26 +5,29 @@ import { access_token } from "../lib/constants";
 import { verifyAccessOrRefreshToken } from "../lib/token";
 import { redisStore } from "../lib/redis";
 import { prisma } from "../lib/db";
+import { User } from "@prisma/client";
 
 export const isAuthenticated = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const accessToken = req.cookies!.access_token as string;
-      console.log(accessToken);
 
       if (!accessToken)
         return next(new ErrorHandler("Login to Access Resource. ", 400));
 
       const decoded = verifyAccessOrRefreshToken(accessToken, access_token);
-      // console.log("mmmmmmmmmmmmm", decoded)
 
       if (!decoded) return next(new ErrorHandler("Invalid Access Token", 400));
-      const userExists = await redisStore.get(decoded.id);
+      const userExists = await prisma.user.findUnique({
+        where: {
+          id: decoded.id,
+        },
+      });
 
       if (!userExists)
         return next(new ErrorHandler("User does not exist", 400));
 
-      req.user = JSON.parse(userExists);
+      req.user = JSON.parse(JSON.stringify(userExists));
       return next();
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

@@ -11,6 +11,7 @@ export {
   resetPassword,
   emailVerified,
   assignAdminOrSuperAdmin,
+  requestPasswordReset,
 } from "./auth.service";
 export {
   createNewConference,

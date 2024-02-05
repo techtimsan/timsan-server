@@ -9,4 +9,4 @@ export const iotbTechRoute = Router({
     strict: true
 })
 
-iotbTechRoute.post("/register", validateData(RegisterFellowshipSchema), isAuthenticated,  registerForTechFellowship)
+iotbTechRoute.post("/register", validateData(RegisterFellowshipSchema),  registerForTechFellowship)

@@ -9,6 +9,7 @@ import { LoginUserData, RegisterUserData } from "../types/app";
 import {
   BASE_API_URL,
   BASE_SERVER_URL,
+  CLIENT_URL,
   access_token,
   access_token_expire,
   refresh_token,
@@ -17,6 +18,7 @@ import {
 import {
   accessTokenOptions,
   generateEmailConfirmationToken,
+  generateForgotassword,
   refreshTokenOptions,
   sendAccessAndRefreshToken,
   signJWTAccessToken,
@@ -28,6 +30,7 @@ import jwt from "jsonwebtoken";
 import { cloudUpload } from "../lib/upload";
 import argon from "argon2";
 import { User } from "@prisma/client";
+import otpGenerator from "otp-generator";
 
 export const registerUser = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -105,8 +108,6 @@ export const registerUser = asyncErrorMiddleware(
               expiresAt,
             })
           );
-
-          console.log(redisUserData);
 
           const templateData = {
             firstName,
@@ -490,46 +491,79 @@ export const deleteUserById = asyncErrorMiddleware(
   }
 );
 
+// token=327955&id=clrhw7u0i0000mm54lzpz4xah
+// {"hashedToken":"$argon2id$v=19$m=65536,t=3,p=4$Y716axBRZVXA3FRbbj8/JA$8udflph8y3FC41G4pTFxD77ciau0aVaRhmuz7iV24Sk","expiresIn":1707123262033}
+// when user forgets assword
 export const resetPassword = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const {
-        oldPassword,
+        userId,
+        token,
         newPassword,
       }: {
-        oldPassword: string;
+        userId: string;
+        token: string;
         newPassword: string;
       } = req.body;
 
-      const userId = req.user?.id;
+      const userDetails = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          resetToken: true,
+          resetTokenExpiresIn: true,
+        },
+      });
 
-      if (!userId) {
-        return next(new ErrorHandler("Not Authenticated", 400));
+      if (!userDetails)
+        return next(new ErrorHandler("User does not exist", 400));
+
+      // const isValidToken = await prisma.user.findFirst();
+      // console.log(isValidToken);
+
+      // if (!isValidToken) {
+      //   return next(new ErrorHandler("Invalid Credentials - User Id.", 400));
+      // }
+
+      const isExpired = new Date() >= userDetails.resetTokenExpiresIn!;
+
+      console.log("time don go? ", isExpired);
+
+      if (isExpired) {
+        return next(new ErrorHandler("Token Already expired.", 400));
       }
 
-      const user = await prisma.user.findFirst({
+      const isTokenCorrect = await argon2.verify(
+        userDetails.resetToken!,
+        token
+      );
+
+      if (!isTokenCorrect)
+        return next(new ErrorHandler("Invalid Reset Token", 400));
+
+      // search db by email and userId TODO:
+      const user = await prisma.user.findUnique({
         where: {
           id: userId,
         },
       });
 
-      if (!user) return next(new ErrorHandler("", 400));
+      if (!user) return next(new ErrorHandler("User does not exist", 400));
 
       if (user.password === undefined || user.password === "") {
         return next(new ErrorHandler("Invalid User", 400));
       }
 
-      const isPasswordMatch = argon2.verify(oldPassword, user.password);
-
-      if (!isPasswordMatch)
-        return next(new ErrorHandler("Invalid Credentials", 400));
+      const newHashedPassword = await argon2.hash(newPassword);
 
       const updatedUser = await prisma.user.update({
         where: {
           id: user.id,
         },
         data: {
-          password: newPassword,
+          password: newHashedPassword,
         },
       });
 
@@ -540,13 +574,14 @@ export const resetPassword = asyncErrorMiddleware(
         message: "Password Reset Successfully",
       });
     } catch (error: any) {
+      console.log(error);
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
 // forgot password
-export const forgotPassword = asyncErrorMiddleware(
+export const requestPasswordReset = asyncErrorMiddleware(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email }: { email: string } = req.body;
@@ -556,30 +591,78 @@ export const forgotPassword = asyncErrorMiddleware(
           email,
         },
         select: {
+          id: true,
           email: true,
+          firstName: true,
         },
       });
 
       if (!user) {
-        return next(new ErrorHandler("Invalid Credentials", 400));
+        return next(new ErrorHandler("Invalid Credentials Submitted", 400));
       }
 
-      // send email
-      const link = {
-        forgotPasswordLink: `https://timsan.com.ng/forgot-password?token=`,
-      };
-
-      await sendEmail({
-        emailAddress: email,
-        subject: "Forgot Password",
-        template: "forgot-password.ejs", // TODO: create file
-        data: {},
+      const resetToken = otpGenerator.generate(6, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        specialChars: false,
+        upperCaseAlphabets: false,
       });
+
+      const hashedToken = await argon2.hash(resetToken);
+
+      // save reset token to redis
+      // redisStore.exists(user.id, async (err, exists) => {
+      //   const tokenData = { hashedToken, expiresIn: Date.now() + 3600 };
+      //   if (exists) {
+      //     const updatedEntry = await redisStore.set(
+      //       user.id,
+      //       JSON.stringify(tokenData)
+      //     );
+      //     console.log("updatedEntry - ", updatedEntry);
+      //   } else {
+      //     const newEntry = await redisStore.set(
+      //       user.id,
+      //       JSON.stringify(tokenData)
+      //     );
+      //     console.log("newEntry - ", newEntry)
+      //   }
+      // });
+
+      const currentDate = new Date();
+
+      // Set the date and time to 1 hour from now
+      const oneHourFromNow = new Date(currentDate.getTime() + 60 * 60 * 1000);
+      // save token to db
+      const resetTokenInDB = await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          resetToken: hashedToken,
+          resetTokenExpiresIn: oneHourFromNow,
+        },
+      });
+
+      // await sendEmail({
+      //   emailAddress: email,
+      //   subject: "Forgot Password",
+      //   template: "forgot-password.ejs", // TODO: create file
+      //   data: {
+      //     firstName: user.firstName,
+      //     forgotPasswordLink: `${CLIENT_URL}/passwordReset?token=${resetToken}&id=${user.id}`,
+      //   },
+      // });
 
       res.status(200).json({
-        message: "Reset Password - Email has been sent! to your Email...",
+        success: true,
+        message: "Email has been sent! to your Inbox.",
+        data: {
+          resetToken,
+          userId: user.id,
+        },
       });
     } catch (error: any) {
+      console.log(error);
       return next(new ErrorHandler(error.message, 400));
     }
   }
