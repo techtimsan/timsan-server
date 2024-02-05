@@ -643,15 +643,15 @@ export const requestPasswordReset = asyncErrorMiddleware(
         },
       });
 
-      // await sendEmail({
-      //   emailAddress: email,
-      //   subject: "Forgot Password",
-      //   template: "forgot-password.ejs", // TODO: create file
-      //   data: {
-      //     firstName: user.firstName,
-      //     forgotPasswordLink: `${CLIENT_URL}/passwordReset?token=${resetToken}&id=${user.id}`,
-      //   },
-      // });
+      await sendEmail({
+        emailAddress: email,
+        subject: "Forgot Password",
+        template: "forgot-password.ejs", // TODO: create file
+        data: {
+          firstName: user.firstName,
+          forgotPasswordLink: `${CLIENT_URL}/reset-password?token=${resetToken}&id=${user.id}`,
+        },
+      });
 
       res.status(200).json({
         success: true,
