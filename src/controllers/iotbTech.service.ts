@@ -41,8 +41,8 @@ export const registerForTechFellowship = asyncErrorMiddleware(
       });
 
       // confirm email address
-      if (alreadyRegistered?.user.email !== emailAddress)
-        return next(new ErrorHandler("Invalid Email Address", 400));
+      // if (alreadyRegistered?.user.email !== emailAddress)
+      //   return next(new ErrorHandler("Invalid Email Address", 400));
 
       if (alreadyRegistered)
         return next(
