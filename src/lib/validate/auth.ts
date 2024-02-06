@@ -26,7 +26,7 @@ export const formatZodError = (error: ZodError) => {
 
 export const ResetPasswordSchema = z.object({
   token: z.string().min(6).max(6),
-  userId: z.string().cuid(),
+  userId: z.string().cuid({ message: "Invalid User Id Provided" }),
   newPassword: z.string().min(6),
 });
 
