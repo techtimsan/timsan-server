@@ -675,6 +675,8 @@ model IOTBTechFellowship {
   collaborationTool CollaborationTool
   feedbackAndInquiry String
   stack Stack
+  pcHours Int
+  weeklyHours Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

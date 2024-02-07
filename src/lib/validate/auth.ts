@@ -343,6 +343,8 @@ export const RegisterFellowshipSchema = z.object({
   feedbackAndInquiry: z.string(),
   stack: z.enum(["PRODUCT_DESIGN", "GRAPHICS", "WEB", "CLOUD"]),
   emailAddress: z.string(),
+  pcHours: z.number(),
+  weeklyHours: z.number(),
 });
 
 export const validateData =

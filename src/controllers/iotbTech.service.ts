@@ -29,6 +29,8 @@ export const registerForTechFellowship = asyncErrorMiddleware(
         feedbackAndInquiry,
         stack,
         emailAddress,
+        pcHours,
+        weeklyHours
       }: IOTBTechApplication = req.body;
 
       const alreadyRegistered = await prisma.iOTBTechFellowship.findFirst({
@@ -68,6 +70,8 @@ export const registerForTechFellowship = asyncErrorMiddleware(
           collaborationTool,
           feedbackAndInquiry,
           stack,
+          pcHours,
+          weeklyHours
         },
       });
 
